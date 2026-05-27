@@ -13,21 +13,22 @@
     body { font-family: sans-serif; margin: 0; }
     #initialMessage { position: fixed; top: calc(50% + 100px); left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: rgba(0, 0, 0, 0.85); color: white; border-radius: 10px; text-align: center; font-size: 18px; z-index: 1001; max-width: 90%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     
-    /* Container para alinhar os botões de controle */
-    #controlsContainer { position: fixed; top: 20px; left: 20px; z-index: 999; display: flex; gap: 10px; align-items: center; }
-    
+    /* Configuração geral dos botões de controle */
     .control-btn { background-color: rgba(0, 0, 0, 0.42); border: none; border-radius: 5px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 4px; color: white; height: 44px; }
     .control-btn:hover { background-color: rgba(0, 0, 0, 0.6); transform: scale(1.05); }
     .control-btn:active { transform: scale(0.95); } /* Efeito sutil de clique */
     .control-btn .text { font-size: 16px; }
 
+    /* Botão Play/Pause fixado na Esquerda */
+    #playPauseButton { position: fixed; top: 20px; left: 20px; z-index: 999; }
     #playPauseButton.is-playing { padding: 0 20px; }
     #playPauseButton.is-paused { padding: 0 10px; }
     #playPauseButton .icon { color: #28a745; }
     #playPauseButton.is-playing .icon { font-size: 24px; }
     #playPauseButton.is-paused .icon { font-size: 38px; position: relative; bottom: 2px; left: 2px; }
 
-    #skipReplayButton { padding: 0 15px; }
+    /* Botão Skip/Replay fixado na Direita */
+    #skipReplayButton { position: fixed; top: 20px; right: 20px; z-index: 999; padding: 0 15px; }
     #skipReplayButton .icon { font-size: 20px; color: #ffc107; }
 
     #central-button-container { position: fixed; bottom: 100px; left: 50%; transform: translateX(calc(-50% - 8px)); z-index: 999; }
@@ -38,7 +39,10 @@
     #footerSocial a { display: flex; align-items: center; justify-content: center; width: 34.56px; height: 34.56px; text-decoration: none; }
     #footerSocial svg { width: 100%; height: 100%; transition: transform 0.3s ease; }
     #footerSocial a:hover svg { transform: scale(1.1); }
-    #footerSocial a.instagram { width: 41.47px; height: 41.47px; }
+    
+    /* Ajuste do Instagram 5 pixels para a direita */
+    #footerSocial a.instagram { width: 41.47px; height: 41.47px; position: relative; left: 5px; }
+    
     #footerSocial a.telegram, #footerSocial a.telegram svg { width: 51.84px; height: 51.84px; }
     #footerSocial .twitter svg { fill: #000000; } 
     #footerSocial .instagram svg { fill: #833AB4; }
@@ -49,14 +53,12 @@
 <body>
   <div id="initialMessage">Point your phone forward to watch the video, then click Play.</div>
   
-  <div id="controlsContainer">
-    <button id="playPauseButton" class="control-btn is-paused"><span class="icon">▶︎</span> <span class="text">Play</span></button>
-    <button id="skipReplayButton" class="control-btn"><span class="icon">⏭︎</span> <span class="text">Skip</span></button>
-  </div>
+  <button id="playPauseButton" class="control-btn is-paused"><span class="icon">▶︎</span> <span class="text">Play</span></button>
+  <button id="skipReplayButton" class="control-btn"><span class="icon">⏭︎</span> <span class="text">Skip</span></button>
 
   <a-scene vr-mode-ui="enabled: false">
     <a-assets>
-      <video id="Video_Asset_0" src="new/hannah.mp4" playsinline webkit-playsinline></video>
+      <video id="Video_Asset_0" src="new/hannah2.mp4" playsinline webkit-playsinline></video>
       <img id="imagem-final-asset" src="videos/hannah.jpg">
     </a-assets>
     <a-entity id="video-inicial-entity" position="0 1 -8" look-at="[camera]" visible="true"><a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0; transparent: true;"></a-video></a-entity>
@@ -93,11 +95,10 @@
       setupNotifications();
 
       if (video.paused) {
-        // Se a imagem estiver visível, significa que o vídeo acabou ou foi pulado antes.
         if (imageEntity.getAttribute('visible') === 'true' || imageEntity.getAttribute('visible') === true) {
           imageEntity.setAttribute('visible', 'false');
           videoEntity.setAttribute('visible', 'true');
-          video.currentTime = 0; // Volta do início
+          video.currentTime = 0; 
           skipReplayButton.innerHTML = '<span class="icon">⏭︎</span> <span class="text">Skip</span>';
         }
         video.muted = false;
@@ -117,7 +118,7 @@
       const isVideoEndedOrSkipped = video.ended || imageEntity.getAttribute('visible') === 'true' || imageEntity.getAttribute('visible') === true;
 
       if (isVideoEndedOrSkipped) {
-        // Ação: REPLAY (Voltar a assistir)
+        // REPLAY 
         videoEntity.setAttribute('visible', 'true');
         imageEntity.setAttribute('visible', 'false');
         video.currentTime = 0;
@@ -128,7 +129,7 @@
         playPauseButton.classList.replace('is-paused', 'is-playing');
         skipReplayButton.innerHTML = '<span class="icon">⏭︎</span> <span class="text">Skip</span>';
       } else {
-        // Ação: SKIP (Pular vídeo)
+        // SKIP 
         video.pause();
         videoEntity.setAttribute('visible', 'false');
         imageEntity.setAttribute('visible', 'true');
@@ -139,7 +140,7 @@
       }
     });
     
-    // Atualiza automaticamente o botão de Skip para Replay quando o vídeo acaba sozinho
+    // Atualiza botão de Skip para Replay ao acabar o vídeo
     video.addEventListener('ended', function() {
       videoEntity.setAttribute('visible', 'false');
       imageEntity.setAttribute('visible', 'true');
@@ -151,7 +152,6 @@
     });
 
     // --- CÓDIGO PARA NOTIFICAÇÕES ---
-
     let setupDone = false;
     async function setupNotifications() {
       if (setupDone || !('serviceWorker' in navigator) || !('Notification' in window)) {
