@@ -16,9 +16,9 @@
     /* Container para alinhar os botões de controle */
     #controlsContainer { position: fixed; top: 20px; left: 20px; z-index: 999; display: flex; gap: 10px; align-items: center; }
     
-    .control-btn { background-color: rgba(0, 0, 0, 0.42); border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 4px; color: white; height: 44px; }
+    .control-btn { background-color: rgba(0, 0, 0, 0.42); border: none; border-radius: 5px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 4px; color: white; height: 44px; }
     .control-btn:hover { background-color: rgba(0, 0, 0, 0.6); transform: scale(1.05); }
-    .control-btn.rotating { transform: rotate(360deg); }
+    .control-btn:active { transform: scale(0.95); } /* Efeito sutil de clique */
     .control-btn .text { font-size: 16px; }
 
     #playPauseButton.is-playing { padding: 0 20px; }
@@ -109,8 +109,6 @@
         playPauseButton.innerHTML = '<span class="icon">▶︎</span> <span class="text">Play</span>';
         playPauseButton.classList.replace('is-playing', 'is-paused');
       }
-      playPauseButton.classList.add('rotating');
-      setTimeout(() => playPauseButton.classList.remove('rotating'), 300);
     });
 
     // Lógica do botão Skip/Replay
@@ -139,9 +137,6 @@
         playPauseButton.classList.replace('is-playing', 'is-paused');
         skipReplayButton.innerHTML = '<span class="icon">↺</span> <span class="text">Replay</span>';
       }
-
-      skipReplayButton.classList.add('rotating');
-      setTimeout(() => skipReplayButton.classList.remove('rotating'), 300);
     });
     
     // Atualiza automaticamente o botão de Skip para Replay quando o vídeo acaba sozinho
