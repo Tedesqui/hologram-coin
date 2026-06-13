@@ -98,12 +98,17 @@
     const imageEntity = document.querySelector('#imagem-final-entity');
     const initialMessage = document.getElementById('initialMessage');
 
-    // Função de gatilho para a permissão do OneSignal na primeira interação (clique)
-    let promptShown = false;
+let promptShown = false;
     function showOneSignalPrompt() {
       if (!promptShown) {
-        window.OneSignalDeferred.push(function(OneSignal) {
-          OneSignal.Slidedown.promptPush();
+        window.OneSignalDeferred.push(async function(OneSignal) {
+          try {
+            // Em vez de Slidedown, força o Chrome a abrir a janelinha nativa na hora
+            await OneSignal.Notifications.requestPermission();
+            console.log("Prompt nativo solicitado no mobile.");
+          } catch (error) {
+            console.error("Erro ao pedir permissão nativa:", error);
+          }
         });
         promptShown = true;
       }
