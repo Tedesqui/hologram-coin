@@ -6,8 +6,17 @@
   <title>𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌 𝐂𝐎𝐈𝐍</title>
 
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "6f75095c-a01d-4485-8858-c7819a5b9651",
+      });
+    });
+  </script>
 
   <style>
     body { font-family: sans-serif; margin: 0; }
@@ -56,23 +65,23 @@
   <button id="playPauseButton" class="control-btn is-paused"><span class="icon">▶︎</span> <span class="text">Play</span></button>
   <button id="skipReplayButton" class="control-btn"><span class="icon">⏭︎</span> <span class="text">Skip</span></button>
 
-<a-scene vr-mode-ui="enabled: false">
-  <a-assets>
-    <video id="Video_Asset_0" src="new/hannah2.mp4" playsinline webkit-playsinline></video>
-    <img id="imagem-final-asset" src="videos/hannah.jpg">
-  </a-assets>
-  
-  <a-entity id="video-inicial-entity" position="0 1 -8" visible="true">
-    <a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0;"></a-video>
-  </a-entity>
-  
-  <a-entity id="imagem-final-entity" position="0 1 -8" visible="false">
-    <a-image src="#imagem-final-asset" width="5" height="5"></a-image>
-    <a-text value="BUY ELON MUSK DRIVING A BYD NOW!!!\nCLICK THE GREEN BUTTON BELOW!!!" align="center" color="white" width="10" position="0 -3 0"></a-text>
-  </a-entity>
-  
-  <a-camera id="camera1"></a-camera>
-</a-scene>
+  <a-scene vr-mode-ui="enabled: false">
+    <a-assets>
+      <video id="Video_Asset_0" src="new/hannah2.mp4" playsinline webkit-playsinline></video>
+      <img id="imagem-final-asset" src="videos/hannah.jpg">
+    </a-assets>
+    
+    <a-entity id="video-inicial-entity" position="0 1 -8" visible="true">
+      <a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0; transparent: true;"></a-video>
+    </a-entity>
+    
+    <a-entity id="imagem-final-entity" position="0 1 -8" visible="false">
+      <a-image src="#imagem-final-asset" width="5" height="5" material="transparent: true;"></a-image>
+      <a-text value="BUY ELON MUSK DRIVING A BYD NOW!!!\nCLICK THE GREEN BUTTON BELOW!!!" align="center" color="white" width="10" position="0 -3 0"></a-text>
+    </a-entity>
+    
+    <a-camera id="camera1"></a-camera>
+  </a-scene>
 
   <div id="central-button-container"><a href="https://pump.fun/coin/4DEC6sboxXviCsygyuvJ4nSGmrSvSQPtadDgGnGdpump" target="_blank" rel="noopener noreferrer" class="prosperity-button" aria-label="Link Prosperidade">$</a></div>
   <div id="footerSocial">
@@ -89,9 +98,20 @@
     const imageEntity = document.querySelector('#imagem-final-entity');
     const initialMessage = document.getElementById('initialMessage');
 
+    // Função de gatilho para a permissão do OneSignal na primeira interação (clique)
+    let promptShown = false;
+    function showOneSignalPrompt() {
+      if (!promptShown) {
+        window.OneSignalDeferred.push(function(OneSignal) {
+          OneSignal.Slidedown.promptPush();
+        });
+        promptShown = true;
+      }
+    }
+
     // Lógica do botão Play/Pause
     playPauseButton.addEventListener('click', () => {
-      setupNotifications();
+      showOneSignalPrompt(); // Aciona o prompt nativo
 
       // Esconde a mensagem inicial imediatamente ao clicar
       if (initialMessage) {
@@ -118,7 +138,8 @@
 
     // Lógica do botão Skip/Replay
     skipReplayButton.addEventListener('click', () => {
-      setupNotifications();
+      showOneSignalPrompt(); // Aciona o prompt nativo
+
       const isVideoEndedOrSkipped = video.ended || imageEntity.getAttribute('visible') === 'true' || imageEntity.getAttribute('visible') === true;
 
       if (isVideoEndedOrSkipped) {
@@ -153,35 +174,6 @@
       playPauseButton.classList.replace('is-playing', 'is-paused');
       
       skipReplayButton.innerHTML = '<span class="icon">↺</span> <span class="text">Replay</span>';
-    });
-
-    // --- CÓDIGO PARA NOTIFICAÇÕES ---
-    let setupDone = false;
-    async function setupNotifications() {
-      if (setupDone || !('serviceWorker' in navigator) || !('Notification' in window)) {
-        return;
-      }
-      setupDone = true;
-
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          await navigator.serviceWorker.register('./service-worker.js');
-          console.log('Permissão concedida e Service Worker registrado.');
-        }
-      } catch (error) {
-        console.error('Erro no setup de notificações:', error);
-      }
-    }
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-          navigator.serviceWorker.controller.postMessage({
-            action: 'schedule-notification'
-          });
-        }
-      }
     });
   </script>
 </body>
