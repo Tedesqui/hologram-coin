@@ -5,6 +5,15 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌 𝐂𝐎𝐈𝐍</title>
 
+  <!-- Ícone para o iOS (iPhone/iPad) -->
+  <link rel="apple-touch-icon" href="icone.png">
+  <!-- Ícone padrão para Android e Navegadores de PC -->
+  <link rel="icon" type="image/png" href="icone.png">
+  <!-- Força a barra superior do iPhone a ficar com cor escura combinando com o app -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- Define o nome curtinho que vai aparecer embaixo do ícone na tela do celular -->
+  <meta name="apple-mobile-web-app-title" content="Hologram">
+
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
@@ -56,10 +65,59 @@
     #footerSocial .twitter svg { fill: #000000; } 
     #footerSocial .instagram svg { fill: #833AB4; }
     #footerSocial .telegram svg { fill: #0088cc; }
+
+    /* Estilo do aviso exclusivo para iOS */
+    #iosInstallPrompt {
+      display: none; /* Escondido por padrão */
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.95);
+      color: #000;
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      z-index: 10000;
+      width: 85%;
+      max-width: 350px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: bold;
+    }
+    #iosInstallPrompt .share-icon {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+      margin: 0 5px;
+    }
+    #iosInstallPrompt .close-btn {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #ff3b30;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: bold;
+    }
   </style>
 </head>
 
 <body>
+  <!-- Modal de aviso para iOS -->
+  <div id="iosInstallPrompt">
+    <button class="close-btn" onclick="document.getElementById('iosInstallPrompt').style.display='none'">X</button>
+    Para receber notificações de altíssima prioridade, toque em 
+    <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>
+    e selecione <strong>"Adicionar à Tela de Início"</strong>.
+  </div>
+
   <div id="initialMessage">Point your phone forward to watch the video, then click Play.</div>
   
   <button id="playPauseButton" class="control-btn is-paused"><span class="icon">▶︎</span> <span class="text">Play</span></button>
@@ -98,7 +156,7 @@
     const imageEntity = document.querySelector('#imagem-final-entity');
     const initialMessage = document.getElementById('initialMessage');
 
-let promptShown = false;
+    let promptShown = false;
     function showOneSignalPrompt() {
       if (!promptShown) {
         window.OneSignalDeferred.push(async function(OneSignal) {
@@ -180,6 +238,28 @@ let promptShown = false;
       
       skipReplayButton.innerHTML = '<span class="icon">↺</span> <span class="text">Replay</span>';
     });
+
+    // Função para detectar iPhone/iPad e se já está instalado
+    function checkIOSInstallation() {
+      const isIos = () => {
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        return /iphone|ipad|ipod/.test(userAgent);
+      };
+
+      // Verifica se o site já está rodando como app (standalone)
+      const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+
+      // Se for iOS e ainda NÃO estiver instalado, mostra o aviso!
+      if (isIos() && !isInStandaloneMode()) {
+        const prompt = document.getElementById('iosInstallPrompt');
+        if (prompt) {
+          prompt.style.display = 'block';
+        }
+      }
+    }
+
+    // Executa a checagem assim que a página carregar
+    window.addEventListener('load', checkIOSInstallation);
   </script>
 </body>
 </html>
