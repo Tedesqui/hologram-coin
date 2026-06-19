@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="icone.png">
   <link rel="icon" type="image/png" href="icone.png">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Hologram">
+  <meta name="apple-mobile-web-app-title" content="𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌">
 
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
@@ -120,7 +120,7 @@
     </a-assets>
     
     <a-entity id="video-inicial-entity" position="0 1 -8" visible="true">
-      <a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0; transparent: true;"></a-video>
+      <a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0;"></a-video>
     </a-entity>
     
     <a-entity id="imagem-final-entity" position="0 1 -8" visible="false">
@@ -149,13 +149,13 @@
     // --- DICIONÁRIO CONFIGURADO COM TEXTOS E CAMINHOS DE VÍDEO DIFERENTES ---
     const translations = {
       pt: {
-        videoUrl: "new/hannah2.mp4", // Vídeo em português
+        videoUrl: "new/hannah2_br.mp4", // Vídeo em português
         initial: "Aponte o celular para frente para assistir ao vídeo e clique em Play.",
         ios: `Para receber notificações de altíssima prioridade, toque em <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> e selecione <strong>"Adicionar à Tela de Início"</strong>.`,
         finalText: "COMPRE ELON MUSK DIRIGINDO UM BYD AGORA!!!\nCLIQUE NO BOTAO $ !!!"
       },
       en: {
-        videoUrl: "new/hannah2_en.mp4", // Vídeo em inglês
+        videoUrl: "new/hannah2.mp4", // Vídeo em inglês
         initial: "Point your phone forward to watch the video, then click Play.",
         ios: `To receive high-priority notifications, tap <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> and select <strong>"Add to Home Screen"</strong>.`,
         finalText: "BUY ELON MUSK DRIVING A BYD NOW!!!\nCLICK THE $ BUTTON!!!"
