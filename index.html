@@ -117,6 +117,7 @@
     <a-assets>
       <video id="Video_Asset_0" playsinline webkit-playsinline></video>
       <img id="imagem-final-asset" src="videos/hannah.jpg">
+      <canvas id="textCanvas" width="2048" height="512" style="display:none;"></canvas>
     </a-assets>
     
     <a-entity id="video-inicial-entity" position="0 1 -8" visible="true">
@@ -125,7 +126,7 @@
     
     <a-entity id="imagem-final-entity" position="0 1 -8" visible="false">
       <a-image src="#imagem-final-asset" width="5" height="5" material="transparent: true;"></a-image>
-      <a-text id="finalText" align="center" color="white" width="10" position="0 -3.5 0"></a-text>
+      <a-plane id="finalTextPlane" width="8" height="2" position="0 -3.5 0" material="shader: flat; transparent: true; src: #textCanvas; opacity: 1;"></a-plane>
     </a-entity>
     
     <a-camera id="camera1"></a-camera>
@@ -146,66 +147,139 @@
     const imageEntity = document.querySelector('#imagem-final-entity');
     const initialMessage = document.getElementById('initialMessage');
 
-    // --- DICIONÁRIO CONFIGURADO COM TEXTOS E CAMINHOS DE VÍDEO DIFERENTES ---
+    // --- DICIONÁRIO COMPLETO COM TRADUÇÕES E INDICAÇÃO DOS VÍDEOS INDIVIDUAIS ---
     const translations = {
       pt: {
-        videoUrl: "new/hannah2_br.mp4", // Vídeo em português
+        videoUrl: "new/hannah2_br.mp4",
         initial: "Aponte o celular para frente para assistir ao vídeo e clique em Play.",
         ios: `Para receber notificações de altíssima prioridade, toque em <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> e selecione <strong>"Adicionar à Tela de Início"</strong>.`,
-        finalText: "COMPRE ELON MUSK DIRIGINDO UM BYD AGORA!!!<br>CLIQUE NO BOTAO <strong>$</strong> !!!"
+        finalText: "COMPRE ELON MUSK DIRIGINDO UM BYD AGORA!!!\nCLIQUE NO BOTAO $ !!!"
       },
       en: {
-        videoUrl: "new/hannah2.mp4", // Vídeo em inglês
+        videoUrl: "new/hannah2.mp4",
         initial: "Point your phone forward to watch the video, then click Play.",
         ios: `To receive high-priority notifications, tap <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> and select <strong>"Add to Home Screen"</strong>.`,
         finalText: "BUY ELON MUSK DRIVING A BYD NOW!!!\nCLICK THE $ BUTTON!!!"
       },
       es: {
-        videoUrl: "new/hannah2_es.mp4", // Vídeo em espanhol
+        videoUrl: "new/hannah2_es.mp4",
         initial: "Apunta tu teléfono hacia adelante para ver el video, luego haz clic en Play.",
         ios: `Para recibir notificaciones de alta prioridad, toca en <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> y selecciona <strong>"Añadir a la pantalla de inicio"</strong>.`,
         finalText: "¡¡¡COMPRA A ELON MUSK CONDUCIENDO UN BYD AHORA!!!\n¡¡¡HAZ CLIC EN EL BOTON $ !!!"
       },
       fr: {
-        videoUrl: "new/hannah2_fr.mp4", // Vídeo em francês
+        videoUrl: "new/hannah2_fr.mp4",
         initial: "Pointez votre téléphone vers l'avant pour regarder la vidéo, puis cliquez sur Play.",
         ios: `Pour recevoir des notifications de haute priorité, appuyez sur <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> et sélectionnez <strong>"Sur l'écran d'accueil"</strong>.`,
         finalText: "ACHETEZ ELON MUSK CONDUISANT UNE BYD MAINTENANT !!!\nCLIQUEZ SUR LE BOUTON $ !!!"
       },
       de: {
-        videoUrl: "new/hannah2_de.mp4", // Vídeo em alemão
+        videoUrl: "new/hannah2_de.mp4",
         initial: "Richten Sie Ihr Telefon nach vorne, um das Video anzusehen, und klicken Sie auf Play.",
         ios: `Um Benachrichtigungen mit hoher Priorität zu erhalten, tippen Sie auf <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> und wählen Sie <strong>"Zum Home-Bildschirm"</strong>.`,
-        finalText: "KAUFEN SIE ELON MUSK BEIM FAHREN EINES BYD JETZT!!!\nKlicken Sie auf die $-Taste!!!"
+        finalText: "KAUFEN SIE ELON MUSK BEIM FAHREN EINES BYD JETZT!!!\nKLICKEN SIE AUF DIE $-TASTE!!!"
       },
       ja: {
-        videoUrl: "new/hannah2_ja.mp4", // Vídeo em japonês
+        videoUrl: "new/hannah2_ja.mp4",
         initial: "スマートフォンを前方に向けて動画を視聴し、[Play]をクリックしてください。",
         ios: `優先度の高い通知を受け取るには、<svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>をタップして<strong>「ホーム画面に追加」</strong>を選択してください。`,
         finalText: "今すぐBYDを運転するイーロン・マスクを購入してください！！！\n$ ボタンをクリックしてください!!!"
       },
       ko: {
-        videoUrl: "new/hannah2_ko.mp4", // Vídeo em coreano
+        videoUrl: "new/hannah2_ko.mp4",
         initial: "동영상을 시청하려면 휴대폰을 앞쪽으로 향하게 한 다음 재생(Play)을 클릭하세요.",
         ios: `높은 우선순위 알림을 받으려면 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>을 누르고 <strong>'홈 화면에 추가'</strong>를 선택하세요.`,
         finalText: "지금 BYD를 운전하는 일론 머스크를 구매하세요!!!\n$ 버튼을 클릭하세요!!!"
       },
       zh: {
-        videoUrl: "new/hannah2_zh.mp4", // Vídeo em chinês
+        videoUrl: "new/hannah2_zh.mp4",
         initial: "将手机向前对准以观看视频，然后点击播放（Play）。",
         ios: `要接收高优先级通知，请点击 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> 并选择<strong>“添加到主屏幕”</strong>。`,
         finalText: "现在购买埃隆·马斯克驾驶BYD！！！\n点击 $ 按钮！！！"
       }
     };
 
+    // --- NOVA LOGÍCA INTELIGENTE DE RENDERIZAÇÃO TEXTUAL 2D -> 3D ---
+    function renderRichTextToCanvas(text) {
+      const canvas = document.getElementById('textCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      
+      // Limpa as renderizações anteriores para garantir canal alpha transparente estável
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'white';
+      
+      // Quebra as linhas utilizando o padrão de quebra \n
+      const lines = text.split('\n');
+      
+      lines.forEach((line, index) => {
+        // Calcula a posição Y exata de forma proporcional à quantidade de linhas mapeadas
+        const y = canvas.height / 2 + (index - (lines.length - 1) / 2) * 130;
+        
+        if (line.includes('$')) {
+          const parts = line.split('$');
+          
+          // Estilização das fontes em alta resolução para manter nitidez total em VR/AR
+          const normalFont = 'bold 64px sans-serif'; 
+          const boldFont = 'black 105px sans-serif'; // Peso extra-grosso exclusivo para o caractere de moeda $
+          
+          ctx.font = normalFont;
+          const widthPart1 = ctx.measureText(parts[0]).width;
+          
+          ctx.font = boldFont;
+          const widthDollar = ctx.measureText('$').width;
+          
+          ctx.font = normalFont;
+          const widthPart2 = ctx.measureText(parts[1]).width;
+          
+          // Calcula o tamanho total da frase completa para centralizar perfeitamente no 3D
+          const totalWidth = widthPart1 + widthDollar + widthPart2;
+          let startX = canvas.width / 2 - totalWidth / 2;
+          
+          // Desenha a primeira parte da frase
+          ctx.font = normalFont;
+          ctx.textAlign = 'left';
+          ctx.fillStyle = 'white';
+          ctx.fillText(parts[0], startX, y);
+          startX += widthPart1;
+          
+          // Desenha o símbolo de moeda "$" totalmente em Negrito Extremo (Bold)
+          ctx.font = boldFont;
+          ctx.fillStyle = 'white'; 
+          ctx.fillText('$', startX, y);
+          startX += widthDollar;
+          
+          // Desenha a parte final da frase após a moeda
+          ctx.font = normalFont;
+          ctx.fillStyle = 'white';
+          ctx.fillText(parts[1], startX, y);
+        } else {
+          // Linhas sem o caractere "$" utilizam a fonte imponente padrão centralizada
+          ctx.font = 'bold 64px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(line, canvas.width / 2, y);
+        }
+      });
+      
+      // Força a atualização imediata da textura dentro da malha tridimensional do A-Frame
+      const plane = document.getElementById('finalTextPlane');
+      if (plane && plane.getObject3D('mesh')) {
+        const material = plane.getObject3D('mesh').material;
+        if (material && material.map) {
+          material.map.needsUpdate = true;
+        }
+      }
+    }
+
     function configureLanguageAndTexts() {
       const userLang = (navigator.language || navigator.userLanguage).substring(0, 2);
       const activeLang = translations[userLang] ? userLang : 'en';
 
-      // [AÇÃO DETECTADA] Injeta dinamicamente o link do vídeo correto baseado no idioma
       if (video) {
         video.src = translations[activeLang].videoUrl;
-        video.load(); // Avisa o navegador para carregar as configurações do novo link
+        video.load(); 
       }
 
       if (initialMessage) {
@@ -220,10 +294,8 @@
         `;
       }
 
-      const finalTextEl = document.getElementById('finalText');
-      if (finalTextEl) {
-        finalTextEl.setAttribute('value', translations[activeLang].finalText);
-      }
+      // Executa o processamento do canvas personalizado para a frase final
+      renderRichTextToCanvas(translations[activeLang].finalText);
     }
 
     let promptShown = false;
