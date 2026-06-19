@@ -115,16 +115,16 @@
 
   <a-scene vr-mode-ui="enabled: false">
     <a-assets>
-      <video id="Video_Asset_0" src="new/hannah2.mp4" playsinline webkit-playsinline></video>
+      <video id="Video_Asset_0" playsinline webkit-playsinline></video>
       <img id="imagem-final-asset" src="videos/hannah.jpg">
     </a-assets>
     
     <a-entity id="video-inicial-entity" position="0 1 -8" visible="true">
-      <a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0;"></a-video>
+      <a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0; transparent: true;"></a-video>
     </a-entity>
     
     <a-entity id="imagem-final-entity" position="0 1 -8" visible="false">
-      <a-image src="#imagem-final-asset" width="5" height="5"></a-image>
+      <a-image src="#imagem-final-asset" width="5" height="5" material="transparent: true;"></a-image>
       <a-text id="finalText" align="center" color="white" width="10" position="0 -5 0"></a-text>
     </a-entity>
     
@@ -146,44 +146,52 @@
     const imageEntity = document.querySelector('#imagem-final-entity');
     const initialMessage = document.getElementById('initialMessage');
 
-    // --- DICIONÁRIO DE TRADUÇÃO EXPANDIDO COM TODAS AS LÍNGUAS SOLICITADAS ---
+    // --- DICIONÁRIO CONFIGURADO COM TEXTOS E CAMINHOS DE VÍDEO DIFERENTES ---
     const translations = {
       pt: {
+        videoUrl: "new/hannah2.mp4", // Vídeo em português
         initial: "Aponte o celular para frente para assistir ao vídeo e clique em Play.",
         ios: `Para receber notificações de altíssima prioridade, toque em <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> e selecione <strong>"Adicionar à Tela de Início"</strong>.`,
         finalText: "COMPRE ELON MUSK DIRIGINDO UM BYD AGORA!!!\nCLIQUE NO BOTAO $ !!!"
       },
       en: {
+        videoUrl: "new/hannah2_en.mp4", // Vídeo em inglês
         initial: "Point your phone forward to watch the video, then click Play.",
         ios: `To receive high-priority notifications, tap <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> and select <strong>"Add to Home Screen"</strong>.`,
         finalText: "BUY ELON MUSK DRIVING A BYD NOW!!!\nCLICK THE $ BUTTON!!!"
       },
       es: {
+        videoUrl: "new/hannah2_es.mp4", // Vídeo em espanhol
         initial: "Apunta tu teléfono hacia adelante para ver el video, luego haz clic en Play.",
         ios: `Para recibir notificaciones de alta prioridad, toca en <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> y selecciona <strong>"Añadir a la pantalla de inicio"</strong>.`,
-        finalText: "¡¡¡COMPRA A ELON MUSK CONDUCIENDO UN BYD AHORA!!!\n¡¡¡HAZ CLIC EN EL BOTÓN $ !!!"
+        finalText: "¡¡¡COMPRA A ELON MUSK CONDUCIENDO UN BYD AHORA!!!\n¡¡¡HAZ CLIC EN EL BOTON $ !!!"
       },
       fr: {
+        videoUrl: "new/hannah2_fr.mp4", // Vídeo em francês
         initial: "Pointez votre téléphone vers l'avant pour regarder la vidéo, puis cliquez sur Play.",
         ios: `Pour recevoir des notifications de haute priorité, appuyez sur <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> et sélectionnez <strong>"Sur l'écran d'accueil"</strong>.`,
         finalText: "ACHETEZ ELON MUSK CONDUISANT UNE BYD MAINTENANT !!!\nCLIQUEZ SUR LE BOUTON $ !!!"
       },
       de: {
+        videoUrl: "new/hannah2_de.mp4", // Vídeo em alemão
         initial: "Richten Sie Ihr Telefon nach vorne, um das Video anzusehen, und klicken Sie auf Play.",
         ios: `Um Benachrichtigungen mit hoher Priorität zu erhalten, tippen Sie auf <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> und wählen Sie <strong>"Zum Home-Bildschirm"</strong>.`,
-        finalText: "KAUFEN SIE ELON MUSK BEIM FAHREN EINES BYD JETZT!!!\nKLICKEN SIE AUF DEN $ BUTTON!!!"
+        finalText: "KAUFEN SIE ELON MUSK BEIM FAHREN EINES BYD JETZT!!!\nKlicken Sie auf die $-Taste!!!"
       },
       ja: {
+        videoUrl: "new/hannah2_ja.mp4", // Vídeo em japonês
         initial: "スマートフォンを前方に向けて動画を視聴し、[Play]をクリックしてください。",
         ios: `優先度の高い通知を受け取るには、<svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>をタップして<strong>「ホーム画面に追加」</strong>を選択してください。`,
         finalText: "今すぐBYDを運転するイーロン・マスクを購入してください！！！\n$ ボタンをクリックしてください!!!"
       },
       ko: {
+        videoUrl: "new/hannah2_ko.mp4", // Vídeo em coreano
         initial: "동영상을 시청하려면 휴대폰을 앞쪽으로 향하게 한 다음 재생(Play)을 클릭하세요.",
         ios: `높은 우선순위 알림을 받으려면 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>을 누르고 <strong>'홈 화면에 추가'</strong>를 선택하세요.`,
         finalText: "지금 BYD를 운전하는 일론 머스크를 구매하세요!!!\n$ 버튼을 클릭하세요!!!"
       },
       zh: {
+        videoUrl: "new/hannah2_zh.mp4", // Vídeo em chinês
         initial: "将手机向前对准以观看视频，然后点击播放（Play）。",
         ios: `要接收高优先级通知，请点击 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> 并选择<strong>“添加到主屏幕”</strong>。`,
         finalText: "现在购买埃隆·马斯克驾驶BYD！！！\n点击 $ 按钮！！！"
@@ -191,18 +199,19 @@
     };
 
     function configureLanguageAndTexts() {
-      // Captura as duas primeiras letras do idioma do celular (ex: "pt-BR" vira "pt")
       const userLang = (navigator.language || navigator.userLanguage).substring(0, 2);
-      
-      // Se o idioma não estiver no dicionário, define o Inglês (en) como padrão
       const activeLang = translations[userLang] ? userLang : 'en';
 
-      // 1. Injeta o texto de instrução inicial
+      // [AÇÃO DETECTADA] Injeta dinamicamente o link do vídeo correto baseado no idioma
+      if (video) {
+        video.src = translations[activeLang].videoUrl;
+        video.load(); // Avisa o navegador para carregar as configurações do novo link
+      }
+
       if (initialMessage) {
         initialMessage.innerText = translations[activeLang].initial;
       }
 
-      // 2. Injeta o texto do balão do iOS mantendo o botão de fechar funcional
       const iosPrompt = document.getElementById('iosInstallPrompt');
       if (iosPrompt) {
         iosPrompt.innerHTML = `
@@ -211,7 +220,6 @@
         `;
       }
 
-      // 3. Traduz dinamicamente o texto 3D do A-Frame abaixo do asset final
       const finalTextEl = document.getElementById('finalText');
       if (finalTextEl) {
         finalTextEl.setAttribute('value', translations[activeLang].finalText);
@@ -313,7 +321,7 @@
       }
     }
 
-    // Executa as traduções e a checagem do iOS assim que a página carregar
+    // Executa as traduções, define o vídeo correto e faz a checagem do iOS
     window.addEventListener('load', () => {
       configureLanguageAndTexts();
       checkIOSInstallation();
