@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌 𝐂𝐎𝐈𝐍</title>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
   <link rel="apple-touch-icon" href="icone.png">
   <link rel="icon" type="image/png" href="icone.png">
@@ -33,16 +35,27 @@
     .control-btn:active { transform: scale(0.95); } /* Efeito sutil de clique */
     .control-btn .text { font-size: 16px; }
 
-    /* Botão Play/Pause fixado na Esquerda */
-    #playPauseButton { position: fixed; top: 20px; left: 20px; z-index: 999; }
+    /* Botão Play/Pause fixado na Esquerda - ATUALIZADO COM SAFE AREA */
+    #playPauseButton { 
+      position: fixed; 
+      top: calc(15px + env(safe-area-inset-top)); 
+      left: max(20px, env(safe-area-inset-left)); 
+      z-index: 999; 
+    }
     #playPauseButton.is-playing { padding: 0 20px; }
     #playPauseButton.is-paused { padding: 0 10px; }
     #playPauseButton .icon { color: #28a745; }
     #playPauseButton.is-playing .icon { font-size: 24px; }
     #playPauseButton.is-paused .icon { font-size: 38px; position: relative; bottom: 2px; left: 2px; }
 
-    /* Botão Skip/Replay fixado na Direita */
-    #skipReplayButton { position: fixed; top: 20px; right: 20px; z-index: 999; padding: 0 15px; }
+    /* Botão Skip/Replay fixado na Direita - ATUALIZADO COM SAFE AREA */
+    #skipReplayButton { 
+      position: fixed; 
+      top: calc(15px + env(safe-area-inset-top)); 
+      right: max(20px, env(safe-area-inset-right)); 
+      z-index: 999; 
+      padding: 0 15px; 
+    }
     #skipReplayButton .icon { font-size: 20px; color: #ffc107; }
 
     #central-button-container { position: fixed; bottom: 100px; left: 50%; transform: translateX(calc(-50% - 8px)); z-index: 999; }
