@@ -12,11 +12,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌">
 
-  <!-- A-Frame para renderização 3D/VR -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
-  <!-- Ethers.js para integração Web3 nativa -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -66,7 +64,30 @@
       z-index: 1;
     }
 
-    #initialMessage { position: fixed; top: calc(50% + 100px); left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: rgba(0, 0, 0, 0.85); color: white; border-radius: 10px; text-align: center; font-size: 18px; z-index: 1001; max-width: 90%; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); pointer-events: none; }
+    /* Mensagem inicial padrão */
+    #initialMessage { 
+      position: fixed; 
+      top: calc(50% + 100px); 
+      left: 50%; 
+      transform: translate(-50%, -50%); 
+      padding: 20px; 
+      background-color: rgba(0, 0, 0, 0.85); 
+      color: white; 
+      border-radius: 10px; 
+      text-align: center; 
+      font-size: 18px; 
+      z-index: 1001; 
+      max-width: 90%; 
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+      pointer-events: none; 
+    }
+
+    /* CORREÇÃO DO IPHONE: Move a mensagem para baixo para não tapar o aviso de sensores do iOS */
+    .is-iphone #initialMessage {
+      top: auto !important;
+      bottom: 180px !important;
+      transform: translateX(-50%) !important;
+    }
     
     /* Configuração geral dos botões de controle */
     .control-btn { background-color: rgba(0, 0, 0, 0.42); border: none; border-radius: 5px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 4px; color: white; height: 44px; }
@@ -177,13 +198,11 @@
 </head>
 
 <body>
-  <!-- Elemento de captura da Câmera Real em Background -->
   <video id="webcam-background" autoplay playsinline muted></video>
 
   <div id="iosInstallPrompt"></div>
   <div id="initialMessage"></div>
   
-  <!-- MODAL CUSTOMIZADO -->
   <div id="customModalOverlay" class="hidden">
     <div id="customModalBox">
       <h3 id="customModalTitle">Hologram Coin</h3>
@@ -206,13 +225,12 @@
       <canvas id="textCanvas" width="2048" height="512" style="display:none;"></canvas>
     </a-assets>
     
-    <!-- Proporções de volta para o padrão original quadrado (5x5) -->
     <a-entity id="video-inicial-entity" position="0 1 -8" visible="true">
-      <a-video width="7" height="5" material="shader: flat; src: #Video_Asset_0;"></a-video>
+      <a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0;"></a-video>
     </a-entity>
     
     <a-entity id="imagem-final-entity" position="0 1 -8" visible="false">
-      <a-image src="#imagem-final-asset" width="7" height="5" material="transparent: true;"></a-image>
+      <a-image src="#imagem-final-asset" width="5" height="5" material="transparent: true;"></a-image>
       <a-plane id="finalTextPlane" width="11" height="3" position="0 -3.2 0" material="shader: flat; transparent: true; src: #textCanvas; opacity: 1;"></a-plane>
     </a-entity>
     
@@ -238,7 +256,7 @@
     const initialMessage = document.getElementById('initialMessage');
     const buyTokenBtn = document.getElementById('buyTokenBtn');
 
-    // --- INICIALIZADOR DA WEBCAM NATIVA ---
+    // --- INICIALIZADOR DA WEBCAM NATIVA COM SUPORTE AO SAFARI ---
     async function initWebcam() {
       const videoBg = document.getElementById('webcam-background');
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -250,7 +268,7 @@
           videoBg.srcObject = stream;
           
           videoBg.play().catch(e => {
-            console.log("Aguardando interação da tela para permissão de vídeo...");
+            console.log("Safari bloqueou o autoplay. Aguardando o primeiro toque na tela para abrir a câmera.");
             document.body.addEventListener('click', () => {
               videoBg.play();
             }, { once: true });
@@ -261,7 +279,7 @@
       }
     }
 
-    // --- FUNÇÃO DO MODAL CUSTOMIZADO (CAPAZ DE RECEBER REDIRECIONAMENTOS DEEP LINK QUANDO AUTORIZADO) ---
+    // --- FUNÇÃO DO MODAL CUSTOMIZADO (COM SUPORTE A REDIRECIONAMENTO DIRETO) ---
     function showCustomModal(message, showInput, btnCancelText, btnOkText, redirectUrl = null) {
       return new Promise((resolve) => {
         const overlay = document.getElementById('customModalOverlay');
@@ -295,7 +313,6 @@
         };
 
         btnOk.onclick = () => { 
-          // Executa redirecionamento de imediato no clique (Chrome/Android/Brave), burlando o bloqueio assíncrono
           if(redirectUrl) {
             window.location.href = redirectUrl;
           }
@@ -306,7 +323,7 @@
       });
     }
 
-    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO (COM VARIANTES PARA SAFARI VS. CHROME) ---
+    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO ---
     const translations = {
       pt: {
         videoUrl: "new/hannah2_br.mp4",
@@ -679,7 +696,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 COM DETECÇÃO INTELIGENTE DE NAVEGADOR PARA DEEP LINK ---
+    // --- LOGÍCA WEB3 COM DETECÇÃO INTELIGENTE DE NAVEGADOR ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -694,20 +711,15 @@
       const activeLang = translations[userLang] ? userLang : 'en';
       const langText = translations[activeLang];
 
-      // SE NÃO FOR DETECTADA A CONEXÃO WEB3 (O usuário está no Safari ou Chrome normal do celular/PC)
       if (typeof window.ethereum === 'undefined') {
         const userAgent = navigator.userAgent.toLowerCase();
-        
-        // Expressão regular confiável para detectar se o navegador é o Safari (Mac ou iOS)
         const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
 
         if (isSafari) {
-          // No Safari: Apenas exibe o aviso solicitando que o usuário copie e cole o link manualmente. 
-          // Não tentamos o redirecionamento Deep Link pois a Apple bloqueia na maioria das vezes.
+          // No Safari: Apenas exibe o aviso, sem forçar o redirecionamento.
           await showCustomModal(langText.web3MissingSafari, false, "", langText.btnOk);
         } else {
-          // No Chrome, Edge, Android: Monta o Deep Link da MetaMask e exibe no modal.
-          // Quando o usuário clicar em "OK", o link será disparado síncronamente burlando qualquer bloqueio de pop-up.
+          // No Chrome/Outros: Monta o Deep Link e executa o redirecionamento no clique do "OK".
           const dappUrl = window.location.href.replace(/^https?:\/\//, '');
           const metaMaskDeepLink = "https://metamask.app.link/dapp/" + dappUrl;
           showCustomModal(langText.web3Missing, false, "", langText.btnOk, metaMaskDeepLink);
@@ -715,7 +727,6 @@
         return;
       }
 
-      // SE O USUÁRIO ESTIVER NA METAMASK, O FLUXO DE COMPRA CONTINUA NORMALMENTE:
       try {
         buyTokenBtn.innerHTML = "⏳";
         buyTokenBtn.style.pointerEvents = "none";
@@ -798,10 +809,16 @@
       }
     });
 
+    // Detecta iPhone e aplica classe corretiva
     window.addEventListener('load', () => {
       configureLanguageAndTexts();
       checkIOSInstallation();
       initWebcam(); 
+      
+      const isIosDevice = /iPhone|iPod|iPad/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (isIosDevice) {
+        document.body.classList.add('is-iphone');
+      }
     });
   </script>
 </body>
