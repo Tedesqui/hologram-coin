@@ -28,7 +28,7 @@
   </script>
 
   <style>
-    /* Configuração de transparência total para permitir que a câmera apareça ao fundo */
+    /* Força transparência total nas camadas para exibição perfeita do ambiente real ao fundo */
     html, body { 
       font-family: sans-serif; 
       margin: 0; 
@@ -36,9 +36,22 @@
       width: 100%; 
       height: 100%; 
       overflow: hidden;
-      background-color: transparent !important; 
+      background-color: transparent !important;
+      background: transparent !important;
     }
     
+    /* Elemento de vídeo nativo em tela cheia posicionado atrás do cenário 3D */
+    #webcam-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -2;
+      pointer-events: none;
+    }
+
     #initialMessage { position: fixed; top: calc(50% + 100px); left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: rgba(0, 0, 0, 0.85); color: white; border-radius: 10px; text-align: center; font-size: 18px; z-index: 1001; max-width: 90%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     
     /* Configuração geral dos botões de controle */
@@ -141,26 +154,17 @@
     #customModalCancel:hover { background: #555; transform: scale(1.05); }
     #customModalCancel.hidden { display: none; }
     
-    /* Garante transparência estrutural do canvas tridimensional */
+    /* Transparência do Canvas WebGL do A-Frame */
     canvas.a-canvas {
       background-color: transparent !important;
-    }
-
-    /* CSS de Segurança: Força o elemento de webcam injetado pelo AR.js a ficar visível sob o navegador da MetaMask */
-    body > video, fieldset > video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      z-index: -2 !important;
-      display: block !important;
+      background: transparent !important;
     }
   </style>
 </head>
 
 <body>
+  <video id="webcam-background" autoplay playsinline muted></video>
+
   <div id="iosInstallPrompt"></div>
   <div id="initialMessage"></div>
   
@@ -179,7 +183,7 @@
   <button id="playPauseButton" class="control-btn is-paused"><span class="icon">▶︎</span> <span class="text">Play</span></button>
   <button id="skipReplayButton" class="control-btn"><span class="icon">⏭︎</span> <span class="text">Skip</span></button>
 
-  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false" loading-screen="enabled: false">
+  <a-scene vr-mode-ui="enabled: false" loading-screen="enabled: false">
     <a-assets>
       <video id="Video_Asset_0" playsinline webkit-playsinline></video>
       <img id="imagem-final-asset" src="videos/hannah.jpg">
@@ -195,7 +199,7 @@
       <a-plane id="finalTextPlane" width="11" height="3" position="0 -3.2 0" material="shader: flat; transparent: true; src: #textCanvas; opacity: 1;"></a-plane>
     </a-entity>
     
-    <a-camera id="camera1"></a-camera>
+    <a-camera id="camera1" wasd-controls="enabled: false" look-controls="enabled: false"></a-camera>
   </a-scene>
 
   <div id="central-button-container">
@@ -216,6 +220,22 @@
     const imageEntity = document.querySelector('#imagem-final-entity');
     const initialMessage = document.getElementById('initialMessage');
     const buyTokenBtn = document.getElementById('buyTokenBtn');
+
+    // --- FUNÇÃO PARA INICIALIZAR A CÂMERA DE FORMA COMPATÍVEL ---
+    async function initWebcam() {
+      const videoBg = document.getElementById('webcam-background');
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+            audio: false
+          });
+          videoBg.srcObject = stream;
+        } catch (err) {
+          console.error("Erro ao abrir a webcam:", err);
+        }
+      }
+    }
 
     // --- FUNÇÃO DE GERENCIAMENTO DE MODAL CUSTOMIZADO ---
     function showCustomModal(message, showInput, btnCancelText, btnOkText) {
@@ -255,7 +275,7 @@
       });
     }
 
-    // --- DICIONÁRIO DE TRADUÇÕES CORRIGIDO E EXPANDIDO ---
+    // --- DICIONÁRIO DE TRADUÇÕES ---
     const translations = {
       pt: {
         videoUrl: "new/hannah2_br.mp4",
@@ -309,9 +329,9 @@
         txSuccess: "¡Compra exitosa! Los tokens ELONBYD ya están en tu billetera.",
         txFailed: "La transacción fue cancelada o falló. Verifica si tienes saldo suficiente de POL para la compra y las tarifas de gas.",
         insufficientTokens: "No hay suficientes tokens ELONBYD en el contrato para esta compra.",
-        amountTooLow: "El valor enviado en POL es demasiado bajo para comprar la fracción mínima.",
+        amountTooLow: "El valor enviado en POL es demasiado bajo para comprar a fracción mínima.",
         onlyOwner: "Solo el propietario del contrato puede realizar esta acción.",
-        priceNotSet: "El preço de venta del token no ha sido configurado en el contrato.",
+        priceNotSet: "El precio de venta del token no ha sido configurado en el contrato.",
         sendPol: "Por favor, envíe una cantidad de POL mayor que 0 para comprar.",
         failWithdraw: "Error al retirar los tokens del contrato.",
         btnOk: "OK",
@@ -347,7 +367,7 @@
         invalidAmount: "Ungültiger Betrag",
         txSent: "Transaktion gesendet! Warten auf die Bestätigung Ihres ELONBYD-Kaufs durch das Polygon-Netzwerk...",
         txSuccess: "Kauf erfolgreich! Die ELONBYD-Token befinden sich jetzt in Ihrem Wallet.",
-        txFailed: "Die Transaktion wurde abgebrochen oder ist fechlagen. Bitte überprüfen Sie, ob Sie genügend POL-Guthaben für den Kauf und die Gasgebühren haben.",
+        txFailed: "Die Transaktion wurde abgebrochen oder ist fehlgeschlagen. Bitte überprüfen Sie, ob Sie genügend POL-Guthaben für den Kauf und die Gasgebühren haben.",
         insufficientTokens: "Es gibt nicht genügend ELONBYD-Token im Vertrag für diesen Kauf.",
         amountTooLow: "Der gesendete POL-Betrag ist zu niedrig, um den Mindestanteil zu kaufen.",
         onlyOwner: "Nur der Vertragseigentümer kann diese Aktion ausführen.",
@@ -391,7 +411,7 @@
         insufficientTokens: "이 구매를 위한 ELONBYD 토큰이 계약에 부족합니다.",
         amountTooLow: "보낸 POL 금액이 너무 적어 최소 수량을 구매할 수 없습니다.",
         onlyOwner: "계약 소유자만 이 작업을 수행할 수 있습니다.",
-        priceNotSet: "토큰 판매 가격이 계약에 구성되지 않았습니다.",
+        priceNotSet: "토큰 판매 가격이 계약에 구성되었습니다.",
         sendPol: "구매하려면 0보다 큰 POL 금액을 보내주세요.",
         failWithdraw: "계약에서 토큰을 출금하는 데 실패했습니다.",
         btnOk: "확인",
@@ -402,7 +422,7 @@
         initial: "将手机向前对准以观看视频，然后点击播放（Play）。",
         ios: `要接收高优先级通知，请点击 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> 并选择<strong>“添加到主屏幕”</strong>。`,
         finalText: "现在购买埃隆·马斯克驾驶BYD！！！\n点击 $ 按钮！！！",
-        web3Missing: "要购买ELONBYD，请在Web3钱包（如MetaMask or Trust Wallet）的浏览器中打开此网站。",
+        web3Missing: "要购买ELONBYD，请在Web3钱包（如MetaMask或Trust Wallet）的浏览器中打开此网站。",
         buyPrompt: "您想投资多少POL来购买ELONBYD (Elon Musk Driving a BYD)？",
         invalidAmount: "无效的金额",
         txSent: "交易已发送！正在等待Polygon网络确认您的ELONBYD购买...",
@@ -539,7 +559,7 @@
       }
     }
 
-    // Lógica do botão Play/Pause (CORRIGIDO)
+    // Lógica do botão Play/Pause (Corrigido permanente)
     playPauseButton.addEventListener('click', () => {
       showOneSignalPrompt();
 
@@ -559,7 +579,6 @@
         playPauseButton.innerHTML = '<span class="icon">⏸︎</span> <span class="text">Pause</span>';
         playPauseButton.classList.replace('is-paused', 'is-playing');
       } else {
-        video.navigate = false;
         video.pause();
         playPauseButton.innerHTML = '<span class="icon">▶︎</span> <span class="text">Play</span>';
         playPauseButton.classList.replace('is-playing', 'is-paused');
@@ -619,7 +638,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 TOTALMENTE CORRIGIDA E SEM ERROS DE SINTAXE ---
+    // --- LOGÍCA WEB3 TOTALMENTE COMPILADA E COMPATÍVEL ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -705,7 +724,7 @@
         } else if (errorMessage.includes("Falha ao retirar tokens")) {
           showCustomModal(langText.failWithdraw, false, "", langText.btnOk);
         } else if (error.message === translations[userLang]?.invalidAmount || error.message === translations['en'].invalidAmount) {
-          // Operação cancelada de forma limpa pelo usuário
+          // Operação abortada sem erros extras
         } else {
           showCustomModal(langText.txFailed, false, "", langText.btnOk);
         }
@@ -718,6 +737,7 @@
     window.addEventListener('load', () => {
       configureLanguageAndTexts();
       checkIOSInstallation();
+      initWebcam(); // Inicializa a câmera nativa sob o canvas 3D
     });
   </script>
 </body>
