@@ -28,16 +28,25 @@
   </script>
 
   <style>
-    body { font-family: sans-serif; margin: 0; }
+    /* Força o fundo a ser PRETO para evitar o bug de tela branca da MetaMask e garantir a leitura dos textos 3D */
+    html, body { 
+      font-family: sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      width: 100%; 
+      height: 100%; 
+      background-color: #000000 !important; 
+    }
+    
     #initialMessage { position: fixed; top: calc(50% + 100px); left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: rgba(0, 0, 0, 0.85); color: white; border-radius: 10px; text-align: center; font-size: 18px; z-index: 1001; max-width: 90%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     
     /* Configuração geral dos botões de controle */
     .control-btn { background-color: rgba(0, 0, 0, 0.42); border: none; border-radius: 5px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 4px; color: white; height: 44px; }
     .control-btn:hover { background-color: rgba(0, 0, 0, 0.6); transform: scale(1.05); }
-    .control-btn:active { transform: scale(0.95); } /* Efeito sutil de clique */
+    .control-btn:active { transform: scale(0.95); } 
     .control-btn .text { font-size: 16px; }
 
-    /* Botão Play/Pause fixado na Esquerda - ATUALIZADO COM SAFE AREA */
+    /* Botão Play/Pause fixado na Esquerda */
     #playPauseButton { 
       position: fixed; 
       top: calc(15px + env(safe-area-inset-top)); 
@@ -50,7 +59,7 @@
     #playPauseButton.is-playing .icon { font-size: 24px; }
     #playPauseButton.is-paused .icon { font-size: 38px; position: relative; bottom: 2px; left: 2px; }
 
-    /* Botão Skip/Replay fixado na Direita - ATUALIZADO COM SAFE AREA */
+    /* Botão Skip/Replay fixado na Direita */
     #skipReplayButton { 
       position: fixed; 
       top: calc(15px + env(safe-area-inset-top)); 
@@ -69,15 +78,12 @@
     #footerSocial svg { width: 100%; height: 100%; transition: transform 0.3s ease; }
     #footerSocial a:hover svg { transform: scale(1.1); }
     
-    /* Ajuste do Instagram 5 pixels para a direita */
     #footerSocial a.instagram { width: 41.47px; height: 41.47px; position: relative; left: 1px; }
-    
     #footerSocial a.telegram, #footerSocial a.telegram svg { width: 51.84px; height: 51.84px; }
-    #footerSocial .twitter svg { fill: #000000; } 
+    #footerSocial .twitter svg { fill: #ffffff; } 
     #footerSocial .instagram svg { fill: #833AB4; }
     #footerSocial .telegram svg { fill: #0088cc; }
 
-    /* Estilo do aviso exclusivo para iOS */
     #iosInstallPrompt {
       display: none; 
       position: fixed;
@@ -99,31 +105,31 @@
     #iosInstallPrompt .share-icon { display: inline-block; width: 20px; height: 20px; vertical-align: middle; margin: 0 5px; }
     #iosInstallPrompt .close-btn { position: absolute; top: -10px; right: -10px; background: #ff3b30; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; font-size: 14px; cursor: pointer; font-weight: bold; }
 
-    /* --- ESTILOS DO NOVO MODAL CUSTOMIZADO --- */
+    /* --- ESTILOS DO NOVO MODAL CUSTOMIZADO (SUBSTITUI OS ALERTS NATIVOS) --- */
     #customModalOverlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px);
       display: flex; justify-content: center; align-items: center;
       z-index: 100000; opacity: 1; transition: opacity 0.3s ease;
     }
     #customModalOverlay.hidden { opacity: 0; pointer-events: none; }
     #customModalBox {
       background: #1e1e24; color: #fff; padding: 25px; border-radius: 16px;
-      width: 85%; max-width: 360px; text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05);
+      width: 85%; max-width: 350px; text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.08);
       transform: translateY(0); transition: transform 0.3s ease;
     }
-    #customModalOverlay.hidden #customModalBox { transform: translateY(20px); }
-    #customModalTitle { margin: 0 0 15px 0; font-size: 20px; font-weight: bold; color: #28a745; }
-    #customModalMessage { margin: 0 0 20px 0; font-size: 16px; line-height: 1.4; color: #ddd; }
+    #customModalOverlay.hidden #customModalBox { transform: translateY(30px); }
+    #customModalTitle { margin: 0 0 15px 0; font-size: 22px; font-weight: bold; color: #28a745; text-transform: uppercase; letter-spacing: 1px;}
+    #customModalMessage { margin: 0 0 20px 0; font-size: 16px; line-height: 1.5; color: #ccc; }
     #customModalInput {
-      width: 90%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: none;
-      background: #2a2a35; color: #fff; font-size: 18px; text-align: center; outline: none;
-      box-sizing: border-box;
+      width: 90%; padding: 14px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #444;
+      background: #111; color: #fff; font-size: 18px; text-align: center; outline: none;
+      box-sizing: border-box; transition: border 0.3s;
     }
     #customModalInput:focus { border: 1px solid #28a745; }
     #customModalInput.hidden { display: none; }
-    #customModalButtons { display: flex; gap: 10px; justify-content: center; }
+    #customModalButtons { display: flex; gap: 12px; justify-content: center; }
     #customModalButtons button {
       flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; 
       transition: transform 0.2s, background 0.2s;
@@ -193,7 +199,7 @@
     const initialMessage = document.getElementById('initialMessage');
     const buyTokenBtn = document.getElementById('buyTokenBtn');
 
-    // --- FUNÇÃO DO MODAL CUSTOMIZADO PARA SUBSTITUIR ALERT/PROMPT ---
+    // --- LÓGICA DO MODAL CUSTOMIZADO (SUBSTITUI PROMPT E ALERT) ---
     function showCustomModal(message, showInput, btnCancelText, btnOkText) {
       return new Promise((resolve) => {
         const overlay = document.getElementById('customModalOverlay');
@@ -231,7 +237,7 @@
       });
     }
 
-    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO (INCLUI BOTÕES DO MODAL) ---
+    // --- DICIONÁRIO COMPLETO COM INFORMAÇÕES DO MODAL ---
     const translations = {
       pt: {
         videoUrl: "new/hannah2_br.mp4",
@@ -515,7 +521,7 @@
       }
     }
 
-    // Lógica do botão Play/Pause (CORRIGIDO PARA ▶︎ Play EM VEZ DE Boss)
+    // Lógica do botão Play/Pause COM CORREÇÃO DE TEXTO
     playPauseButton.addEventListener('click', () => {
       showOneSignalPrompt();
 
@@ -594,7 +600,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 PARA COMPRA DIRETA COM O NOVO MODAL ---
+    // --- LOGÍCA WEB3 COMPLETAMENTE INTEGRADA COM O MODAL ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -619,7 +625,7 @@
         await provider.send("eth_requestAccounts", []);
         const signer = provider.getSigner();
 
-        const targetNetworkId = '0x89'; 
+        const targetNetworkId = '0x89'; // Polygon Mainnet
         const { chainId } = await provider.getNetwork();
         
         if (chainId !== 137) {
@@ -646,10 +652,10 @@
           }
         }
 
-        // Troca o prompt nativo feio pelo seu modal customizado
+        // Exibe o modal perguntando a quantidade em vez do prompt padrão
         const polAmount = await showCustomModal(langText.buyPrompt, true, langText.btnCancel, langText.btnOk);
         
-        // Se o usuário clicar em Cancelar, polAmount será null
+        // Se a pessoa clicou em cancelar, polAmount retorna null e aborta sem mostrar erro
         if (!polAmount || isNaN(polAmount) || parseFloat(polAmount) <= 0) {
           throw new Error(langText.invalidAmount);
         }
@@ -659,12 +665,12 @@
 
         const tx = await contract.buyTokens({ value: valorEmWei });
         
-        // Modal de aviso sem bloquear a tela (apenas para avisar que a transação começou)
+        // Alerta inicial do envio, aguardando mineração da transação
         showCustomModal(langText.txSent, false, "", langText.btnOk);
         
         await tx.wait();
         
-        // Quando confirmar, substitui o modal atual pelo modal de sucesso
+        // Alerta de sucesso absoluto
         showCustomModal(langText.txSuccess, false, "", langText.btnOk);
 
       } catch (error) {
@@ -685,9 +691,9 @@
         } else if (errorMessage.includes("Falha ao retirar tokens")) {
           showCustomModal(langText.failWithdraw, false, "", langText.btnOk);
         } else if (error.message === translations[userLang]?.invalidAmount || error.message === translations['en'].invalidAmount) {
-          // O comprador apenas cancelou ou fechou a caixa de digitação (não faz nada)
+          // Quando o usuário cancela ou não insere valores, não emitimos mais nenhum erro extra
         } else {
-          // Rejeições de assinatura na carteira ou erros gerais de rede
+          // Erro que aparece quando o usuário rejeita a assinatura da metamask
           showCustomModal(langText.txFailed, false, "", langText.btnOk);
         }
       } finally {
