@@ -79,7 +79,7 @@
 
     /* Estilo do aviso exclusivo para iOS */
     #iosInstallPrompt {
-      display: none; /* Escondido por padrão */
+      display: none; 
       position: fixed;
       bottom: 20px;
       left: 50%;
@@ -96,35 +96,62 @@
       font-size: 15px;
       font-weight: bold;
     }
-    #iosInstallPrompt .share-icon {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      vertical-align: middle;
-      margin: 0 5px;
+    #iosInstallPrompt .share-icon { display: inline-block; width: 20px; height: 20px; vertical-align: middle; margin: 0 5px; }
+    #iosInstallPrompt .close-btn { position: absolute; top: -10px; right: -10px; background: #ff3b30; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; font-size: 14px; cursor: pointer; font-weight: bold; }
+
+    /* --- ESTILOS DO NOVO MODAL CUSTOMIZADO --- */
+    #customModalOverlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 100000; opacity: 1; transition: opacity 0.3s ease;
     }
-    #iosInstallPrompt .close-btn {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      background: #ff3b30;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 25px;
-      height: 25px;
-      font-size: 14px;
-      cursor: pointer;
-      font-weight: bold;
+    #customModalOverlay.hidden { opacity: 0; pointer-events: none; }
+    #customModalBox {
+      background: #1e1e24; color: #fff; padding: 25px; border-radius: 16px;
+      width: 85%; max-width: 360px; text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05);
+      transform: translateY(0); transition: transform 0.3s ease;
     }
+    #customModalOverlay.hidden #customModalBox { transform: translateY(20px); }
+    #customModalTitle { margin: 0 0 15px 0; font-size: 20px; font-weight: bold; color: #28a745; }
+    #customModalMessage { margin: 0 0 20px 0; font-size: 16px; line-height: 1.4; color: #ddd; }
+    #customModalInput {
+      width: 90%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: none;
+      background: #2a2a35; color: #fff; font-size: 18px; text-align: center; outline: none;
+      box-sizing: border-box;
+    }
+    #customModalInput:focus { border: 1px solid #28a745; }
+    #customModalInput.hidden { display: none; }
+    #customModalButtons { display: flex; gap: 10px; justify-content: center; }
+    #customModalButtons button {
+      flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; 
+      transition: transform 0.2s, background 0.2s;
+    }
+    #customModalConfirm { background: #28a745; color: #fff; }
+    #customModalConfirm:hover { background: #218838; transform: scale(1.05); }
+    #customModalCancel { background: #444; color: #fff; }
+    #customModalCancel:hover { background: #555; transform: scale(1.05); }
+    #customModalCancel.hidden { display: none; }
   </style>
 </head>
 
 <body>
   <div id="iosInstallPrompt"></div>
-
   <div id="initialMessage"></div>
   
+  <div id="customModalOverlay" class="hidden">
+    <div id="customModalBox">
+      <h3 id="customModalTitle">Hologram Coin</h3>
+      <p id="customModalMessage"></p>
+      <input type="number" id="customModalInput" step="any" min="0" class="hidden" placeholder="0.0">
+      <div id="customModalButtons">
+        <button id="customModalCancel" class="hidden">Cancelar</button>
+        <button id="customModalConfirm">OK</button>
+      </div>
+    </div>
+  </div>
+
   <button id="playPauseButton" class="control-btn is-paused"><span class="icon">▶︎</span> <span class="text">Play</span></button>
   <button id="skipReplayButton" class="control-btn"><span class="icon">⏭︎</span> <span class="text">Skip</span></button>
 
@@ -166,7 +193,45 @@
     const initialMessage = document.getElementById('initialMessage');
     const buyTokenBtn = document.getElementById('buyTokenBtn');
 
-    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO (TRATAMENTO COMPLETO DE ERROS WEB3) ---
+    // --- FUNÇÃO DO MODAL CUSTOMIZADO PARA SUBSTITUIR ALERT/PROMPT ---
+    function showCustomModal(message, showInput, btnCancelText, btnOkText) {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById('customModalOverlay');
+        const msgEl = document.getElementById('customModalMessage');
+        const inputEl = document.getElementById('customModalInput');
+        const btnCancel = document.getElementById('customModalCancel');
+        const btnOk = document.getElementById('customModalConfirm');
+
+        msgEl.innerText = message;
+        inputEl.value = '';
+
+        if (showInput) {
+          inputEl.classList.remove('hidden');
+          btnCancel.classList.remove('hidden');
+          setTimeout(() => inputEl.focus(), 100);
+        } else {
+          inputEl.classList.add('hidden');
+          btnCancel.classList.add('hidden');
+        }
+
+        btnCancel.innerText = btnCancelText || "Cancelar";
+        btnOk.innerText = btnOkText || "OK";
+
+        overlay.classList.remove('hidden');
+
+        const closeModal = (result) => {
+          overlay.classList.add('hidden');
+          btnOk.onclick = null;
+          btnCancel.onclick = null;
+          resolve(result);
+        };
+
+        btnOk.onclick = () => { closeModal(showInput ? inputEl.value : true); };
+        btnCancel.onclick = () => { closeModal(null); };
+      });
+    }
+
+    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO (INCLUI BOTÕES DO MODAL) ---
     const translations = {
       pt: {
         videoUrl: "new/hannah2_br.mp4",
@@ -184,7 +249,9 @@
         onlyOwner: "Apenas o proprietário do contrato pode executar esta ação.",
         priceNotSet: "O preço de venda do token não foi configurado no contrato.",
         sendPol: "Por favor, envie uma quantidade de POL maior que 0 para comprar.",
-        failWithdraw: "Falha ao retirar os tokens do contrato."
+        failWithdraw: "Falha ao retirar os tokens do contrato.",
+        btnOk: "OK",
+        btnCancel: "Cancelar"
       },
       en: {
         videoUrl: "new/hannah2.mp4",
@@ -202,7 +269,9 @@
         onlyOwner: "Only the contract owner can execute this action.",
         priceNotSet: "The token sale price has not been configured in the contract.",
         sendPol: "Please send an amount of POL greater than 0 to buy.",
-        failWithdraw: "Failed to withdraw tokens from the contract."
+        failWithdraw: "Failed to withdraw tokens from the contract.",
+        btnOk: "OK",
+        btnCancel: "Cancel"
       },
       es: {
         videoUrl: "new/hannah2_es.mp4",
@@ -220,7 +289,9 @@
         onlyOwner: "Solo el propietario del contrato puede realizar esta acción.",
         priceNotSet: "El precio de venta del token no ha sido configurado en el contrato.",
         sendPol: "Por favor, envíe una cantidad de POL mayor que 0 para comprar.",
-        failWithdraw: "Error al retirar los tokens del contrato."
+        failWithdraw: "Error al retirar los tokens del contrato.",
+        btnOk: "OK",
+        btnCancel: "Cancelar"
       },
       fr: {
         videoUrl: "new/hannah2_fr.mp4",
@@ -238,13 +309,9 @@
         onlyOwner: "Seul le propriétaire du contrat peut exécuter cette action.",
         priceNotSet: "Le prix de vente du jeton n'a pas été configuré dans le contrat.",
         sendPol: "Veuillez envoyer un montant de POL supérieur à 0 pour acheter.",
-        failWithdraw: "Échec du retrait des jetons du contrat."
-      },
-      de: {
-        videoUrl: "new/hannah2_de.mp4",
-        initial: "Richten Sie Ihr Telefon nach vorne, um das Video anzusehen, und klicken Sie auf Play.",
-        ios: `Um Benachrichtigungen mit hoher Priorität zu erhalten, tippen Sie auf <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> und wählen Sie <strong>"Zum Home-Bildschirm"</strong>.`,
-        finalText: "KAUFEN SIE ELON MUSK BEIM FAHREN EINES BYD JETZT!!!\nKLICKEN SIE AUF DIE $-TASTE!!!"
+        failWithdraw: "Échec du retrait des jetons du contrat.",
+        btnOk: "OK",
+        btnCancel: "Annuler"
       },
       de: {
         videoUrl: "new/hannah2_de.mp4",
@@ -262,7 +329,9 @@
         onlyOwner: "Nur der Vertragseigentümer kann diese Aktion ausführen.",
         priceNotSet: "Der Token-Verkaufspreis wurde im Vertrag nicht konfiguriert.",
         sendPol: "Bitte senden Sie einen POL-Betrag größer als 0, um zu kaufen.",
-        failWithdraw: "Fehler beim Abheben von Token aus dem Vertrag."
+        failWithdraw: "Fehler beim Abheben von Token aus dem Vertrag.",
+        btnOk: "OK",
+        btnCancel: "Abbrechen"
       },
       ja: {
         videoUrl: "new/hannah2_ja.mp4",
@@ -280,7 +349,9 @@
         onlyOwner: "コントラクトの所有者のみがこのアクションを実行できます。",
         priceNotSet: "トークンの販売価格がコントラクト内で設定されていません。",
         sendPol: "購入するには0より大きいPOLの量を送信してください。",
-        failWithdraw: "コントラクトからのトークンの引き出しに失敗しました。"
+        failWithdraw: "コントラクトからのトークンの引き出しに失敗しました。",
+        btnOk: "OK",
+        btnCancel: "キャンセル"
       },
       ko: {
         videoUrl: "new/hannah2_ko.mp4",
@@ -298,7 +369,9 @@
         onlyOwner: "계약 소유자만 이 작업을 수행할 수 있습니다.",
         priceNotSet: "토큰 판매 가격이 계약에 구성되지 않았습니다.",
         sendPol: "구매하려면 0보다 큰 POL 금액을 보내주세요.",
-        failWithdraw: "계약에서 토큰을 출금하는 데 실패했습니다."
+        failWithdraw: "계약에서 토큰을 출금하는 데 실패했습니다.",
+        btnOk: "확인",
+        btnCancel: "취소"
       },
       zh: {
         videoUrl: "new/hannah2_zh.mp4",
@@ -316,7 +389,9 @@
         onlyOwner: "只有合约所有者才能执行此操作。",
         priceNotSet: "代币销售价格尚未在合约中配置。",
         sendPol: "请发送大于 0 的 POL 金额以进行购买。",
-        failWithdraw: "从合约中提取代币失败。"
+        failWithdraw: "从合约中提取代币失败。",
+        btnOk: "确认",
+        btnCancel: "取消"
       },
       ru: {
         videoUrl: "new/hannah2_ru.mp4",
@@ -334,11 +409,12 @@
         onlyOwner: "Только владелец контракта может выполнять это действие.",
         priceNotSet: "Цена продажи токена не настроена в контракте.",
         sendPol: "Пожалуйста, отправьте количество POL больше 0 для покупки.",
-        failWithdraw: "Не удалось вывести токены из контракта."
+        failWithdraw: "Не удалось вывести токены из контракта.",
+        btnOk: "OK",
+        btnCancel: "Отмена"
       }    
     };
 
-    // --- NOVA LOGÍCA INTELIGENTE DE RENDERIZAÇÃO TEXTUAL 2D -> 3D ---
     function renderRichTextToCanvas(text) {
       const canvas = document.getElementById('textCanvas');
       if (!canvas) return;
@@ -439,7 +515,7 @@
       }
     }
 
-    // Lógica do botão Play/Pause
+    // Lógica do botão Play/Pause (CORRIGIDO PARA ▶︎ Play EM VEZ DE Boss)
     playPauseButton.addEventListener('click', () => {
       showOneSignalPrompt();
 
@@ -460,7 +536,7 @@
         playPauseButton.classList.replace('is-paused', 'is-playing');
       } else {
         video.pause();
-        playPauseButton.innerHTML = '<span class="icon">▶ Boss</span> <span class="text">Play</span>';
+        playPauseButton.innerHTML = '<span class="icon">▶︎</span> <span class="text">Play</span>';
         playPauseButton.classList.replace('is-playing', 'is-paused');
       }
     });
@@ -518,8 +594,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 PARA COMPRA DIRETA MULTILINGUE COMPLETA ---
-    // ATENÇÃO: COLOQUE O ENDEREÇO DO CONTRATO GERADO NO REMIX NA LINHA ABAIXO
+    // --- LOGÍCA WEB3 PARA COMPRA DIRETA COM O NOVO MODAL ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -532,7 +607,7 @@
       const langText = translations[activeLang];
 
       if (typeof window.ethereum === 'undefined') {
-        alert(langText.web3Missing);
+        await showCustomModal(langText.web3Missing, false, "", langText.btnOk);
         return;
       }
 
@@ -544,7 +619,7 @@
         await provider.send("eth_requestAccounts", []);
         const signer = provider.getSigner();
 
-        const targetNetworkId = '0x89'; // Polygon Mainnet
+        const targetNetworkId = '0x89'; 
         const { chainId } = await provider.getNetwork();
         
         if (chainId !== 137) {
@@ -571,7 +646,10 @@
           }
         }
 
-        const polAmount = prompt(langText.buyPrompt);
+        // Troca o prompt nativo feio pelo seu modal customizado
+        const polAmount = await showCustomModal(langText.buyPrompt, true, langText.btnCancel, langText.btnOk);
+        
+        // Se o usuário clicar em Cancelar, polAmount será null
         if (!polAmount || isNaN(polAmount) || parseFloat(polAmount) <= 0) {
           throw new Error(langText.invalidAmount);
         }
@@ -581,34 +659,36 @@
 
         const tx = await contract.buyTokens({ value: valorEmWei });
         
-        alert(langText.txSent);
+        // Modal de aviso sem bloquear a tela (apenas para avisar que a transação começou)
+        showCustomModal(langText.txSent, false, "", langText.btnOk);
         
         await tx.wait();
-        alert(langText.txSuccess);
+        
+        // Quando confirmar, substitui o modal atual pelo modal de sucesso
+        showCustomModal(langText.txSuccess, false, "", langText.btnOk);
 
       } catch (error) {
         console.error("Erro detectado na transacao:", error);
         
         const errorMessage = error.toString() || "";
 
-        // CAPTURA INTERNACIONAL DE TODOS OS REQUIRIMENTOS DO CONTRATO SOLIDITY
         if (errorMessage.includes("Nao ha tokens suficientes")) {
-          alert(langText.insufficientTokens);
+          showCustomModal(langText.insufficientTokens, false, "", langText.btnOk);
         } else if (errorMessage.includes("Valor enviado e muito baixo")) {
-          alert(langText.amountTooLow);
+          showCustomModal(langText.amountTooLow, false, "", langText.btnOk);
         } else if (errorMessage.includes("Apenas o dono")) {
-          alert(langText.onlyOwner);
+          showCustomModal(langText.onlyOwner, false, "", langText.btnOk);
         } else if (errorMessage.includes("Preco nao configurado")) {
-          alert(langText.priceNotSet);
+          showCustomModal(langText.priceNotSet, false, "", langText.btnOk);
         } else if (errorMessage.includes("Envie POL para comprar")) {
-          alert(langText.sendPol);
+          showCustomModal(langText.sendPol, false, "", langText.btnOk);
         } else if (errorMessage.includes("Falha ao retirar tokens")) {
-          alert(langText.failWithdraw);
+          showCustomModal(langText.failWithdraw, false, "", langText.btnOk);
         } else if (error.message === translations[userLang]?.invalidAmount || error.message === translations['en'].invalidAmount) {
-          // O comprador apenas cancelou ou fechou a caixa de digitação (prompt)
+          // O comprador apenas cancelou ou fechou a caixa de digitação (não faz nada)
         } else {
           // Rejeições de assinatura na carteira ou erros gerais de rede
-          alert(langText.txFailed);
+          showCustomModal(langText.txFailed, false, "", langText.btnOk);
         }
       } finally {
         buyTokenBtn.innerHTML = "$";
