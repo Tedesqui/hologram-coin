@@ -28,14 +28,15 @@
   </script>
 
   <style>
-    /* Força o fundo a ser PRETO para evitar o bug de tela branca da MetaMask e garantir a leitura dos textos 3D */
+    /* Configuração de transparência total para permitir que a câmera (AR) apareça ao fundo */
     html, body { 
       font-family: sans-serif; 
       margin: 0; 
       padding: 0; 
       width: 100%; 
       height: 100%; 
-      background-color: #000000 !important; 
+      overflow: hidden;
+      background-color: transparent !important; 
     }
     
     #initialMessage { position: fixed; top: calc(50% + 100px); left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: rgba(0, 0, 0, 0.85); color: white; border-radius: 10px; text-align: center; font-size: 18px; z-index: 1001; max-width: 90%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
@@ -105,7 +106,7 @@
     #iosInstallPrompt .share-icon { display: inline-block; width: 20px; height: 20px; vertical-align: middle; margin: 0 5px; }
     #iosInstallPrompt .close-btn { position: absolute; top: -10px; right: -10px; background: #ff3b30; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; font-size: 14px; cursor: pointer; font-weight: bold; }
 
-    /* --- ESTILOS DO NOVO MODAL CUSTOMIZADO (SUBSTITUI OS ALERTS NATIVOS) --- */
+    /* --- ESTILOS DO MODAL CUSTOMIZADO (GLASSMORPHISM PREMIUM) --- */
     #customModalOverlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px);
@@ -139,6 +140,11 @@
     #customModalCancel { background: #444; color: #fff; }
     #customModalCancel:hover { background: #555; transform: scale(1.05); }
     #customModalCancel.hidden { display: none; }
+    
+    /* Corrige o canvas do A-Frame para garantir que não cubra os elementos nativos de vídeo do AR.js */
+    canvas.a-canvas {
+      background-color: transparent !important;
+    }
   </style>
 </head>
 
@@ -161,7 +167,7 @@
   <button id="playPauseButton" class="control-btn is-paused"><span class="icon">▶︎</span> <span class="text">Play</span></button>
   <button id="skipReplayButton" class="control-btn"><span class="icon">⏭︎</span> <span class="text">Skip</span></button>
 
-  <a-scene vr-mode-ui="enabled: false">
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
     <a-assets>
       <video id="Video_Asset_0" playsinline webkit-playsinline></video>
       <img id="imagem-final-asset" src="videos/hannah.jpg">
@@ -199,7 +205,6 @@
     const initialMessage = document.getElementById('initialMessage');
     const buyTokenBtn = document.getElementById('buyTokenBtn');
 
-    // --- LÓGICA DO MODAL CUSTOMIZADO (SUBSTITUI PROMPT E ALERT) ---
     function showCustomModal(message, showInput, btnCancelText, btnOkText) {
       return new Promise((resolve) => {
         const overlay = document.getElementById('customModalOverlay');
@@ -237,7 +242,6 @@
       });
     }
 
-    // --- DICIONÁRIO COMPLETO COM INFORMAÇÕES DO MODAL ---
     const translations = {
       pt: {
         videoUrl: "new/hannah2_br.mp4",
@@ -289,7 +293,7 @@
         invalidAmount: "Cantidad inválida",
         txSent: "¡Transacción enviada! Esperando a que la red Polygon confirme tu compra de ELONBYD...",
         txSuccess: "¡Compra exitosa! Los tokens ELONBYD ya están en tu billetera.",
-        txFailed: "La transacción fue cancelada o falló. Verifica si tienes saldo suficiente de POL para la compra y las tarifas de gas.",
+        txFailed: "La transacción foi cancelada o falló. Verifica si tienes saldo suficiente de POL para la compra y las tarifas de gas.",
         insufficientTokens: "No hay suficientes tokens ELONBYD en el contrato para esta compra.",
         amountTooLow: "El valor enviado en POL es demasiado bajo para comprar la fracción mínima.",
         onlyOwner: "Solo el propietario del contrato puede realizar esta acción.",
@@ -521,7 +525,6 @@
       }
     }
 
-    // Lógica do botão Play/Pause COM CORREÇÃO DE TEXTO
     playPauseButton.addEventListener('click', () => {
       showOneSignalPrompt();
 
@@ -547,7 +550,6 @@
       }
     });
 
-    // Lógica do botão Skip/Replay
     skipReplayButton.addEventListener('click', () => {
       showOneSignalPrompt();
 
@@ -600,7 +602,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 COMPLETAMENTE INTEGRADA COM O MODAL ---
+    // --- LOGÍCA WEB3 TOTALMENTE INTEGRADA ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -625,7 +627,7 @@
         await provider.send("eth_requestAccounts", []);
         const signer = provider.getSigner();
 
-        const targetNetworkId = '0x89'; // Polygon Mainnet
+        const targetNetworkId = '0x89'; 
         const { chainId } = await provider.getNetwork();
         
         if (chainId !== 137) {
@@ -652,10 +654,8 @@
           }
         }
 
-        // Exibe o modal perguntando a quantidade em vez do prompt padrão
         const polAmount = await showCustomModal(langText.buyPrompt, true, langText.btnCancel, langText.btnOk);
         
-        // Se a pessoa clicou em cancelar, polAmount retorna null e aborta sem mostrar erro
         if (!polAmount || isNaN(polAmount) || parseFloat(polAmount) <= 0) {
           throw new Error(langText.invalidAmount);
         }
@@ -665,12 +665,9 @@
 
         const tx = await contract.buyTokens({ value: valorEmWei });
         
-        // Alerta inicial do envio, aguardando mineração da transação
         showCustomModal(langText.txSent, false, "", langText.btnOk);
         
         await tx.wait();
-        
-        // Alerta de sucesso absoluto
         showCustomModal(langText.txSuccess, false, "", langText.btnOk);
 
       } catch (error) {
@@ -691,11 +688,12 @@
         } else if (errorMessage.includes("Falha ao retirar tokens")) {
           showCustomModal(langText.failWithdraw, false, "", langText.btnOk);
         } else if (error.message === translations[userLang]?.invalidAmount || error.message === translations['en'].invalidAmount) {
-          // Quando o usuário cancela ou não insere valores, não emitimos mais nenhum erro extra
+          // Cancelado silenciosamente pelo usuário
         } else {
-          // Erro que aparece quando o usuário rejeita a assinatura da metamask
           showCustomModal(langText.txFailed, false, "", langText.btnOk);
         }
+      } catch (err) {
+        // Fallback genérico para prevenir travamentos de interface
       } finally {
         buyTokenBtn.innerHTML = "$";
         buyTokenBtn.style.pointerEvents = "auto";
