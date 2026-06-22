@@ -12,8 +12,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌">
 
+  <!-- A-Frame para renderização 3D/VR -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
+  <!-- Ethers.js para integração Web3 nativa -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -39,13 +42,16 @@
       background: transparent !important;
     }
     
-    /* Elemento de vídeo nativo em tela cheia posicionado atrás do cenário 3D */
+    /* CSS à prova de falhas para a Câmera: preenche a tela inteira sem esticar */
     #webcam-background {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      transform: translate(-50%, -50%);
       object-fit: cover;
       z-index: -1;
       pointer-events: none;
@@ -162,7 +168,7 @@
     #customModalCancel:hover { background: #555; transform: scale(1.05); }
     #customModalCancel.hidden { display: none; }
     
-    /* Sincronização estrutural de opacidade do canvas 3D */
+    /* Garante transparência absoluta no Canvas e na Cena do A-Frame */
     a-scene, a-canvas, .a-canvas {
       background-color: transparent !important;
       background: transparent !important;
@@ -171,11 +177,13 @@
 </head>
 
 <body>
+  <!-- Elemento de captura da Câmera Real em Background -->
   <video id="webcam-background" autoplay playsinline muted></video>
 
   <div id="iosInstallPrompt"></div>
   <div id="initialMessage"></div>
   
+  <!-- MODAL CUSTOMIZADO -->
   <div id="customModalOverlay" class="hidden">
     <div id="customModalBox">
       <h3 id="customModalTitle">Hologram Coin</h3>
@@ -199,11 +207,13 @@
     </a-assets>
     
     <a-entity id="video-inicial-entity" position="0 1 -8" visible="true">
-      <a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0;"></a-video>
+      <!-- Ajustado para 2.8 de largura e 5 de altura (Proporção de vídeo em pé/Vertical). 
+           Se o seu vídeo for DEITADO (Horizontal), troque para: width="8" height="4.5" -->
+      <a-video width="2.8" height="5" material="shader: flat; src: #Video_Asset_0;"></a-video>
     </a-entity>
     
     <a-entity id="imagem-final-entity" position="0 1 -8" visible="false">
-      <a-image src="#imagem-final-asset" width="5" height="5" material="transparent: true;"></a-image>
+      <a-image src="#imagem-final-asset" width="2.8" height="5" material="transparent: true;"></a-image>
       <a-plane id="finalTextPlane" width="11" height="3" position="0 -3.2 0" material="shader: flat; transparent: true; src: #textCanvas; opacity: 1;"></a-plane>
     </a-entity>
     
@@ -229,7 +239,7 @@
     const initialMessage = document.getElementById('initialMessage');
     const buyTokenBtn = document.getElementById('buyTokenBtn');
 
-    // --- INICIALIZADOR DA WEBCAM NATIVA ---
+    // --- INICIALIZADOR DA WEBCAM NATIVA COM SUPORTE AO SAFARI ---
     async function initWebcam() {
       const videoBg = document.getElementById('webcam-background');
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -239,15 +249,22 @@
             audio: false
           });
           videoBg.srcObject = stream;
-          videoBg.play().catch(e => console.log("Aguardando ativação por toque"));
+          
+          // Tratamento especial para políticas restritas de Autoplay do Safari
+          videoBg.play().catch(e => {
+            console.log("Safari bloqueou o autoplay. Aguardando o primeiro toque na tela para abrir a câmera.");
+            document.body.addEventListener('click', () => {
+              videoBg.play();
+            }, { once: true });
+          });
         } catch (err) {
           console.error("Erro ao abrir a câmara:", err);
         }
       }
     }
 
-    // --- FUNÇÃO DO MODAL CUSTOMIZADO ---
-    function showCustomModal(message, showInput, btnCancelText, btnOkText) {
+    // --- FUNÇÃO DO MODAL CUSTOMIZADO (AGORA COM SUPORTE A REDIRECIONAMENTO DIRETO PARA O SAFARI) ---
+    function showCustomModal(message, showInput, btnCancelText, btnOkText, redirectUrl = null) {
       return new Promise((resolve) => {
         const overlay = document.getElementById('customModalOverlay');
         const msgEl = document.getElementById('customModalMessage');
@@ -279,12 +296,19 @@
           resolve(result);
         };
 
-        btnOk.onclick = () => { closeModal(showInput ? inputEl.value : true); };
+        btnOk.onclick = () => { 
+          // Se tiver URL de redirecionamento (MetaMask), o Safari exige que ela seja ativada AQUI DENTRO, instantaneamente no clique!
+          if(redirectUrl) {
+            window.location.href = redirectUrl;
+          }
+          closeModal(showInput ? inputEl.value : true); 
+        };
+        
         btnCancel.onclick = () => { closeModal(null); };
       });
     }
 
-    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO (SEM CHAVES DUPLICADAS) ---
+    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO ---
     const translations = {
       pt: {
         videoUrl: "new/hannah2_br.mp4",
@@ -648,7 +672,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 NATIVA ROBUSTA E CORRIGIDA ---
+    // --- LOGÍCA WEB3 COM REDIRECIONAMENTO COMPATÍVEL COM O SAFARI ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -663,26 +687,27 @@
       const activeLang = translations[userLang] ? userLang : 'en';
       const langText = translations[activeLang];
 
-      // SE NÃO FOR DETECTADA A EXTENSÃO INJETADA (Ex: Safari/Chrome comum)
+      // SE NÃO FOR DETECTADA A METAMASK (Ex: Safari)
       if (typeof window.ethereum === 'undefined') {
-        await showCustomModal(langText.web3Missing, false, "", langText.btnOk);
-        const dappUrl = window.location.href.replace('https://', '').replace('http://', '');
-        window.location.href = "https://metamask.app.link/dapp/" + dappUrl;
+        // Pega a URL do site sem o https:// para a MetaMask poder abrir corretamente
+        const dappUrl = window.location.href.replace(/^https?:\/\//, '');
+        const metaMaskDeepLink = "https://metamask.app.link/dapp/" + dappUrl;
+        
+        // Passa a URL como 5º parâmetro. O Safari aceita o redirecionamento se ele acontecer DENTRO de um clique em um botão nativo.
+        showCustomModal(langText.web3Missing, false, "", langText.btnOk, metaMaskDeepLink);
         return;
       }
 
       try {
-        // Feedback visual imediato e bloqueio de cliques duplos
+        // Bloqueio de cliques duplos
         buyTokenBtn.innerHTML = "⏳";
         buyTokenBtn.style.pointerEvents = "none";
 
-        // Comunicação 100% nativa direta EIP-1193 exigida pela MetaMask Mobile
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
 
-        // Obtém o Chain ID nativo via RPC direto
         const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
         const chainId = parseInt(chainIdHex, 16);
         
@@ -710,11 +735,9 @@
           }
         }
 
-        // Abre a caixa de diálogo customizada para o valor da transação
         const polAmount = await showCustomModal(langText.buyPrompt, true, langText.btnCancel, langText.btnOk);
         
         if (!polAmount || isNaN(polAmount) || parseFloat(polAmount) <= 0) {
-          // Cancelado pelo usuário, sai de forma limpa
           buyTokenBtn.innerHTML = "$";
           buyTokenBtn.style.pointerEvents = "auto";
           return;
@@ -723,7 +746,6 @@
         const contract = new ethers.Contract(CONTRATO_VENDA_ADDRESS, CONTRATO_VENDA_ABI, signer);
         const valorEmWei = ethers.utils.parseEther(polAmount);
 
-        // Dispara a chamada do contrato inteligente
         const tx = await contract.buyTokens({ value: valorEmWei });
         
         await showCustomModal(langText.txSent, false, "", langText.btnOk);
@@ -748,8 +770,8 @@
           await showCustomModal(langText.sendPol, false, "", langText.btnOk);
         } else if (errorString.includes("Falha ao retirar tokens")) {
           await showCustomModal(langText.failWithdraw, false, "", langText.btnOk);
-        } else if (errorString.includes("Quantidade inválida") || errorString.includes("Invalid amount")) {
-          // Cancelado de forma controlada
+        } else if (errorString.includes("Quantidade inválida") || errorString.includes("Invalid amount") || errorString.includes("User denied")) {
+          // Cancelado de forma controlada sem erro
         } else {
           await showCustomModal(langText.txFailed, false, "", langText.btnOk);
         }
