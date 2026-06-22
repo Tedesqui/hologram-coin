@@ -42,7 +42,7 @@
       background: transparent !important;
     }
     
-    /* CSS à prova de falhas para a Câmera: preenche a tela inteira sem esticar */
+    /* CSS para a Câmera nativa: preenche a tela inteira sem esticar */
     #webcam-background {
       position: fixed;
       top: 50%;
@@ -206,14 +206,13 @@
       <canvas id="textCanvas" width="2048" height="512" style="display:none;"></canvas>
     </a-assets>
     
+    <!-- Proporções de volta para o padrão original quadrado (5x5) -->
     <a-entity id="video-inicial-entity" position="0 1 -8" visible="true">
-      <!-- Ajustado para 2.8 de largura e 5 de altura (Proporção de vídeo em pé/Vertical). 
-           Se o seu vídeo for DEITADO (Horizontal), troque para: width="8" height="4.5" -->
-      <a-video width="2.8" height="5" material="shader: flat; src: #Video_Asset_0;"></a-video>
+      <a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0;"></a-video>
     </a-entity>
     
     <a-entity id="imagem-final-entity" position="0 1 -8" visible="false">
-      <a-image src="#imagem-final-asset" width="2.8" height="5" material="transparent: true;"></a-image>
+      <a-image src="#imagem-final-asset" width="5" height="5" material="transparent: true;"></a-image>
       <a-plane id="finalTextPlane" width="11" height="3" position="0 -3.2 0" material="shader: flat; transparent: true; src: #textCanvas; opacity: 1;"></a-plane>
     </a-entity>
     
@@ -239,7 +238,7 @@
     const initialMessage = document.getElementById('initialMessage');
     const buyTokenBtn = document.getElementById('buyTokenBtn');
 
-    // --- INICIALIZADOR DA WEBCAM NATIVA COM SUPORTE AO SAFARI ---
+    // --- INICIALIZADOR DA WEBCAM NATIVA ---
     async function initWebcam() {
       const videoBg = document.getElementById('webcam-background');
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -250,9 +249,8 @@
           });
           videoBg.srcObject = stream;
           
-          // Tratamento especial para políticas restritas de Autoplay do Safari
           videoBg.play().catch(e => {
-            console.log("Safari bloqueou o autoplay. Aguardando o primeiro toque na tela para abrir a câmera.");
+            console.log("Aguardando interação da tela para permissão de vídeo...");
             document.body.addEventListener('click', () => {
               videoBg.play();
             }, { once: true });
@@ -263,7 +261,7 @@
       }
     }
 
-    // --- FUNÇÃO DO MODAL CUSTOMIZADO (AGORA COM SUPORTE A REDIRECIONAMENTO DIRETO PARA O SAFARI) ---
+    // --- FUNÇÃO DO MODAL CUSTOMIZADO (CAPAZ DE RECEBER REDIRECIONAMENTOS DEEP LINK QUANDO AUTORIZADO) ---
     function showCustomModal(message, showInput, btnCancelText, btnOkText, redirectUrl = null) {
       return new Promise((resolve) => {
         const overlay = document.getElementById('customModalOverlay');
@@ -297,7 +295,7 @@
         };
 
         btnOk.onclick = () => { 
-          // Se tiver URL de redirecionamento (MetaMask), o Safari exige que ela seja ativada AQUI DENTRO, instantaneamente no clique!
+          // Executa redirecionamento de imediato no clique (Chrome/Android/Brave), burlando o bloqueio assíncrono
           if(redirectUrl) {
             window.location.href = redirectUrl;
           }
@@ -308,7 +306,7 @@
       });
     }
 
-    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO ---
+    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO (COM VARIANTES PARA SAFARI VS. CHROME) ---
     const translations = {
       pt: {
         videoUrl: "new/hannah2_br.mp4",
@@ -316,6 +314,7 @@
         ios: `Para receber notificações de altíssima prioridade, toque em <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> e selecione <strong>"Adicionar à Tela de Início"</strong>.`,
         finalText: "COMPRE ELON MUSK DIRIGINDO UM BYD AGORA!!!\nCLIQUE NO BOTAO $ !!!",
         web3Missing: "Para comprar, vamos abrir o navegador seguro no aplicativo da sua carteira MetaMask. Clique em OK para abrir.",
+        web3MissingSafari: "Para comprar ELONBYD, copie e abra este site no navegador de uma carteira Web3 (como MetaMask ou Trust Wallet).",
         buyPrompt: "Quantos POL deseja investir na compra de ELONBYD (Elon Musk Driving a BYD)?",
         invalidAmount: "Quantidade inválida",
         txSent: "Transação enviada! Aguardando a rede Polygon confirmar a sua compra de ELONBYD...",
@@ -336,6 +335,7 @@
         ios: `To receive high-priority notifications, tap <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> and select <strong>"Add to Home Screen"</strong>.`,
         finalText: "BUY ELON MUSK DRIVING A BYD NOW!!!\nCLICK THE $ BUTTON!!!",
         web3Missing: "To buy, we will open the secure browser inside your MetaMask app. Click OK to open.",
+        web3MissingSafari: "To buy ELONBYD, please copy and open this site in a Web3 wallet browser (like MetaMask or Trust Wallet).",
         buyPrompt: "How many POL do you want to invest in buying ELONBYD (Elon Musk Driving a BYD)?",
         invalidAmount: "Invalid amount",
         txSent: "Transaction sent! Waiting for the Polygon network to confirm your ELONBYD purchase...",
@@ -356,6 +356,7 @@
         ios: `Para recibir notificaciones de alta prioridad, toca en <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> y selecciona <strong>"Añadir a la pantalla de inicio"</strong>.`,
         finalText: "¡¡¡COMPRA A ELON MUSK CONDUCIENDO UN BYD AHORA!!!\n¡¡¡HAZ CLIC EN EL BOTON $ !!!",
         web3Missing: "Para comprar, abriremos el navegador seguro dentro de tu aplicación MetaMask. Haz clic en OK para abrir.",
+        web3MissingSafari: "Para comprar ELONBYD, copie y abra este sitio en el navegador de una billetera Web3 (como MetaMask o Trust Wallet).",
         buyPrompt: "¿Cuántos POL deseas investir en la compra de ELONBYD (Elon Musk Driving a BYD)?",
         invalidAmount: "Cantidad inválida",
         txSent: "¡Transacción enviada! Esperando a que la red Polygon confirme tu compra de ELONBYD...",
@@ -376,6 +377,7 @@
         ios: `Pour recevoir des notifications de haute priorité, appuyez sur <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> et sélectionnez <strong>"Sur l'écran d'accueil"</strong>.`,
         finalText: "ACHETEZ ELON MUSK CONDUISANT UNE BYD MAINTENANT !!!\nCLIQUEZ SUR LE BOUTON $ !!!",
         web3Missing: "Pour acheter, nous allons ouvrir le navigateur sécurisé dans votre application MetaMask. Cliquez sur OK pour ouvrir.",
+        web3MissingSafari: "Pour acheter ELONBYD, veuillez copier et ouvrir ce site dans le navigateur d'un portefeuille Web3 (comme MetaMask ou Trust Wallet).",
         buyPrompt: "Combien de POL souhaitez-vous investir dans l'achat d'ELONBYD (Elon Musk Driving a BYD) ?",
         invalidAmount: "Montant invalide",
         txSent: "Transaction envoyée ! En attente de la confirmation de votre achat d'ELONBYD par le réseau Polygon...",
@@ -396,6 +398,7 @@
         ios: `Um Benachrichtigungen mit hoher Priorität zu erhalten, tippen Sie auf <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> und wählen Sie <strong>"Zum Home-Bildschirm"</strong>.`,
         finalText: "KAUFEN SIE ELON MUSK BEIM FAHREN EINES BYD JETZT!!!\nKLICKEN SIE AUF DIE $-TASTE!!!",
         web3Missing: "Um zu kaufen, öffnen wir den sicheren Browser in Ihrer MetaMask-App. Klicken Sie auf OK, um zu öffnen.",
+        web3MissingSafari: "Um ELONBYD zu kaufen, kopieren Sie bitte diese Website und öffnen Sie sie in einem Web3-Wallet-Browser (wie MetaMask oder Trust Wallet).",
         buyPrompt: "Wie viele POL möchten Sie in den Kauf von ELONBYD (Elon Musk Driving a BYD) investieren?",
         invalidAmount: "Ungültiger Betrag",
         txSent: "Transaktion gesendet! Warten auf die Bestätigung Ihres ELONBYD-Kaufs durch das Polygon-Netzwerk...",
@@ -416,6 +419,7 @@
         ios: `優先度の高い通知を受け取るには、<svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>をタップして<strong>「ホーム画面に追加」</strong>を選択してください。`,
         finalText: "今すぐBYDを運転するイーロン・マスクを購入してください！！！\n$ ボタンをクリックしてください!!!",
         web3Missing: "購入するには、MetaMaskアプリ内の安全なブラウザを開きます。[OK]をクリックして開いてください。",
+        web3MissingSafari: "ELONBYDを購入するには、このサイトのURLをコピーしてWeb3ウォレット（MetaMaskやTrust Walletなど）のブラウザで開いてください。",
         buyPrompt: "ELONBYD（Elon Musk Driving a BYD）の購入に何POL投資しますか？",
         invalidAmount: "無効な金額です",
         txSent: "トランザクションが送信されました！PolygonネットワークがELONBYDの購入を確認するのを待っています...",
@@ -436,6 +440,7 @@
         ios: `높은 우선순위 알림을 받으려면 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>을 누르고 <strong>'홈 화면에 추가'</strong>를 선택하세요.`,
         finalText: "지금 BYD를 운전하는 일론 머스크를 구매하세요!!!\n$ 버튼을 클릭하세요!!!",
         web3Missing: "구매하려면 MetaMask 앱 내부의 안전한 브라우저를 열겠습니다. 열려면 OK를 클릭하세요.",
+        web3MissingSafari: "ELONBYD를 구매하려면 이 사이트를 복사하여 Web3 지갑(MetaMask 또는 Trust Wallet 등) 브라우저에서 여세요.",
         buyPrompt: "ELONBYD(Elon Musk Driving a BYD) 구매에 몇 POL을 투자하시겠습니까?",
         invalidAmount: "잘못된 금액입니다",
         txSent: "트랜잭션이 전송되었습니다! Polygon 네트워크가 ELONBYD 구매를 확인할 때까지 기다리는 중...",
@@ -456,6 +461,7 @@
         ios: `要接收高优先级通知，请点击 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> 并选择<strong>“添加到主屏幕”</strong>。`,
         finalText: "现在购买埃隆·马斯克驾驶BYD！！！\n点击 $ 按钮！！！",
         web3Missing: "要购买，我们将打开您 MetaMask 应用内的安全浏览器。点击确定（OK）打开。",
+        web3MissingSafari: "要购买ELONBYD，请复制并在Web3钱包（如MetaMask或Trust Wallet）的浏览器中打开此网站。",
         buyPrompt: "您想投资多少POL来购买ELONBYD (Elon Musk Driving a BYD)？",
         invalidAmount: "无效的金额",
         txSent: "交易已发送！正在等待Polygon网络确认您的ELONBYD购买...",
@@ -476,6 +482,7 @@
         ios: `Чтобы получать уведомления высокого приоритета, нажмите <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> и выберите <strong>«Добавить на главный экран»</strong>.`,
         finalText: "КУПИТЕ ИЛОНА МАСКА, УПРАВЛЯЮЩЕГО BYD, СЕЙЧАС!!!\nНАЖМИТЕ КНОПКУ $ !!!",
         web3Missing: "Чтобы купить, мы откроем безопасный браузер внутри вашего приложения MetaMask. Нажмите ОК, чтобы открыть.",
+        web3MissingSafari: "Чтобы купить ELONBYD, скопируйте и откройте этот сайт в браузере кошелька Web3 (например, MetaMask или Trust Wallet).",
         buyPrompt: "Сколько POL вы хотите инвестировать в покупку ELONBYD (Elon Musk Driving a BYD)?",
         invalidAmount: "Неверная сумма",
         txSent: "Транзакция отправлена! Ожидание подтверждения покупки ELONBYD в сети Polygon...",
@@ -672,7 +679,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 COM REDIRECIONAMENTO COMPATÍVEL COM O SAFARI ---
+    // --- LOGÍCA WEB3 COM DETECÇÃO INTELIGENTE DE NAVEGADOR PARA DEEP LINK ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -687,19 +694,29 @@
       const activeLang = translations[userLang] ? userLang : 'en';
       const langText = translations[activeLang];
 
-      // SE NÃO FOR DETECTADA A METAMASK (Ex: Safari)
+      // SE NÃO FOR DETECTADA A CONEXÃO WEB3 (O usuário está no Safari ou Chrome normal do celular/PC)
       if (typeof window.ethereum === 'undefined') {
-        // Pega a URL do site sem o https:// para a MetaMask poder abrir corretamente
-        const dappUrl = window.location.href.replace(/^https?:\/\//, '');
-        const metaMaskDeepLink = "https://metamask.app.link/dapp/" + dappUrl;
+        const userAgent = navigator.userAgent.toLowerCase();
         
-        // Passa a URL como 5º parâmetro. O Safari aceita o redirecionamento se ele acontecer DENTRO de um clique em um botão nativo.
-        showCustomModal(langText.web3Missing, false, "", langText.btnOk, metaMaskDeepLink);
+        // Expressão regular confiável para detectar se o navegador é o Safari (Mac ou iOS)
+        const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
+
+        if (isSafari) {
+          // No Safari: Apenas exibe o aviso solicitando que o usuário copie e cole o link manualmente. 
+          // Não tentamos o redirecionamento Deep Link pois a Apple bloqueia na maioria das vezes.
+          await showCustomModal(langText.web3MissingSafari, false, "", langText.btnOk);
+        } else {
+          // No Chrome, Edge, Android: Monta o Deep Link da MetaMask e exibe no modal.
+          // Quando o usuário clicar em "OK", o link será disparado síncronamente burlando qualquer bloqueio de pop-up.
+          const dappUrl = window.location.href.replace(/^https?:\/\//, '');
+          const metaMaskDeepLink = "https://metamask.app.link/dapp/" + dappUrl;
+          showCustomModal(langText.web3Missing, false, "", langText.btnOk, metaMaskDeepLink);
+        }
         return;
       }
 
+      // SE O USUÁRIO ESTIVER NA METAMASK, O FLUXO DE COMPRA CONTINUA NORMALMENTE:
       try {
-        // Bloqueio de cliques duplos
         buyTokenBtn.innerHTML = "⏳";
         buyTokenBtn.style.pointerEvents = "none";
 
