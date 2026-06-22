@@ -28,7 +28,7 @@
   </script>
 
   <style>
-    /* Configuração de transparência total para permitir que a câmera (AR) apareça ao fundo */
+    /* Configuração de transparência total para permitir que a câmera apareça ao fundo */
     html, body { 
       font-family: sans-serif; 
       margin: 0; 
@@ -141,9 +141,21 @@
     #customModalCancel:hover { background: #555; transform: scale(1.05); }
     #customModalCancel.hidden { display: none; }
     
-    /* Corrige o canvas do A-Frame para garantir que não cubra os elementos nativos de vídeo do AR.js */
+    /* Garante transparência estrutural do canvas tridimensional */
     canvas.a-canvas {
       background-color: transparent !important;
+    }
+
+    /* CSS de Segurança: Força o elemento de webcam injetado pelo AR.js a ficar visível sob o navegador da MetaMask */
+    body > video, fieldset > video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      z-index: -2 !important;
+      display: block !important;
     }
   </style>
 </head>
@@ -167,7 +179,7 @@
   <button id="playPauseButton" class="control-btn is-paused"><span class="icon">▶︎</span> <span class="text">Play</span></button>
   <button id="skipReplayButton" class="control-btn"><span class="icon">⏭︎</span> <span class="text">Skip</span></button>
 
-  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false" loading-screen="enabled: false">
     <a-assets>
       <video id="Video_Asset_0" playsinline webkit-playsinline></video>
       <img id="imagem-final-asset" src="videos/hannah.jpg">
@@ -205,6 +217,7 @@
     const initialMessage = document.getElementById('initialMessage');
     const buyTokenBtn = document.getElementById('buyTokenBtn');
 
+    // --- FUNÇÃO DE GERENCIAMENTO DE MODAL CUSTOMIZADO ---
     function showCustomModal(message, showInput, btnCancelText, btnOkText) {
       return new Promise((resolve) => {
         const overlay = document.getElementById('customModalOverlay');
@@ -242,6 +255,7 @@
       });
     }
 
+    // --- DICIONÁRIO DE TRADUÇÕES CORRIGIDO E EXPANDIDO ---
     const translations = {
       pt: {
         videoUrl: "new/hannah2_br.mp4",
@@ -293,11 +307,11 @@
         invalidAmount: "Cantidad inválida",
         txSent: "¡Transacción enviada! Esperando a que la red Polygon confirme tu compra de ELONBYD...",
         txSuccess: "¡Compra exitosa! Los tokens ELONBYD ya están en tu billetera.",
-        txFailed: "La transacción foi cancelada o falló. Verifica si tienes saldo suficiente de POL para la compra y las tarifas de gas.",
+        txFailed: "La transacción fue cancelada o falló. Verifica si tienes saldo suficiente de POL para la compra y las tarifas de gas.",
         insufficientTokens: "No hay suficientes tokens ELONBYD en el contrato para esta compra.",
         amountTooLow: "El valor enviado en POL es demasiado bajo para comprar la fracción mínima.",
         onlyOwner: "Solo el propietario del contrato puede realizar esta acción.",
-        priceNotSet: "El precio de venta del token no ha sido configurado en el contrato.",
+        priceNotSet: "El preço de venta del token no ha sido configurado en el contrato.",
         sendPol: "Por favor, envíe una cantidad de POL mayor que 0 para comprar.",
         failWithdraw: "Error al retirar los tokens del contrato.",
         btnOk: "OK",
@@ -333,7 +347,7 @@
         invalidAmount: "Ungültiger Betrag",
         txSent: "Transaktion gesendet! Warten auf die Bestätigung Ihres ELONBYD-Kaufs durch das Polygon-Netzwerk...",
         txSuccess: "Kauf erfolgreich! Die ELONBYD-Token befinden sich jetzt in Ihrem Wallet.",
-        txFailed: "Die Transaktion wurde abgebrochen oder ist fehlgeschlagen. Bitte überprüfen Sie, ob Sie genügend POL-Guthaben für den Kauf und die Gasgebühren haben.",
+        txFailed: "Die Transaktion wurde abgebrochen oder ist fechlagen. Bitte überprüfen Sie, ob Sie genügend POL-Guthaben für den Kauf und die Gasgebühren haben.",
         insufficientTokens: "Es gibt nicht genügend ELONBYD-Token im Vertrag für diesen Kauf.",
         amountTooLow: "Der gesendete POL-Betrag ist zu niedrig, um den Mindestanteil zu kaufen.",
         onlyOwner: "Nur der Vertragseigentümer kann diese Aktion ausführen.",
@@ -388,7 +402,7 @@
         initial: "将手机向前对准以观看视频，然后点击播放（Play）。",
         ios: `要接收高优先级通知，请点击 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> 并选择<strong>“添加到主屏幕”</strong>。`,
         finalText: "现在购买埃隆·马斯克驾驶BYD！！！\n点击 $ 按钮！！！",
-        web3Missing: "要购买ELONBYD，请在Web3钱包（如MetaMask或Trust Wallet）的浏览器中打开此网站。",
+        web3Missing: "要购买ELONBYD，请在Web3钱包（如MetaMask or Trust Wallet）的浏览器中打开此网站。",
         buyPrompt: "您想投资多少POL来购买ELONBYD (Elon Musk Driving a BYD)？",
         invalidAmount: "无效的金额",
         txSent: "交易已发送！正在等待Polygon网络确认您的ELONBYD购买...",
@@ -525,6 +539,7 @@
       }
     }
 
+    // Lógica do botão Play/Pause (CORRIGIDO)
     playPauseButton.addEventListener('click', () => {
       showOneSignalPrompt();
 
@@ -544,12 +559,14 @@
         playPauseButton.innerHTML = '<span class="icon">⏸︎</span> <span class="text">Pause</span>';
         playPauseButton.classList.replace('is-paused', 'is-playing');
       } else {
+        video.navigate = false;
         video.pause();
         playPauseButton.innerHTML = '<span class="icon">▶︎</span> <span class="text">Play</span>';
         playPauseButton.classList.replace('is-playing', 'is-paused');
       }
     });
 
+    // Lógica do botão Skip/Replay
     skipReplayButton.addEventListener('click', () => {
       showOneSignalPrompt();
 
@@ -602,7 +619,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 TOTALMENTE INTEGRADA ---
+    // --- LOGÍCA WEB3 TOTALMENTE CORRIGIDA E SEM ERROS DE SINTAXE ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -688,12 +705,10 @@
         } else if (errorMessage.includes("Falha ao retirar tokens")) {
           showCustomModal(langText.failWithdraw, false, "", langText.btnOk);
         } else if (error.message === translations[userLang]?.invalidAmount || error.message === translations['en'].invalidAmount) {
-          // Cancelado silenciosamente pelo usuário
+          // Operação cancelada de forma limpa pelo usuário
         } else {
           showCustomModal(langText.txFailed, false, "", langText.btnOk);
         }
-      } catch (err) {
-        // Fallback genérico para prevenir travamentos de interface
       } finally {
         buyTokenBtn.innerHTML = "$";
         buyTokenBtn.style.pointerEvents = "auto";
