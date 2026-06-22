@@ -13,7 +13,6 @@
   <meta name="apple-mobile-web-app-title" content="𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌">
 
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
@@ -48,12 +47,20 @@
       width: 100vw;
       height: 100vh;
       object-fit: cover;
-      z-index: -2;
+      z-index: -1;
       pointer-events: none;
-      background-color: transparent !important;
     }
 
-    #initialMessage { position: fixed; top: calc(50% + 100px); left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: rgba(0, 0, 0, 0.85); color: white; border-radius: 10px; text-align: center; font-size: 18px; z-index: 1001; max-width: 90%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    a-scene {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    #initialMessage { position: fixed; top: calc(50% + 100px); left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: rgba(0, 0, 0, 0.85); color: white; border-radius: 10px; text-align: center; font-size: 18px; z-index: 1001; max-width: 90%; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); pointer-events: none; }
     
     /* Configuração geral dos botões de controle */
     .control-btn { background-color: rgba(0, 0, 0, 0.42); border: none; border-radius: 5px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 4px; color: white; height: 44px; }
@@ -84,7 +91,7 @@
     }
     #skipReplayButton .icon { font-size: 20px; color: #ffc107; }
 
-    #central-button-container { position: fixed; bottom: 100px; left: 50%; transform: translateX(calc(-50% - 8px)); z-index: 999; }
+    #central-button-container { position: fixed; bottom: 100px; left: 50%; transform: translateX(calc(-50% - 8px)); z-index: 999; pointer-events: auto; }
     .prosperity-button { display: flex; align-items: center; justify-content: center; width: 51.84px; height: 51.84px; background-color: #28a745; color: white; border-radius: 50%; font-size: 30px; font-weight: bold; text-decoration: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s ease; border: none; cursor: pointer; }
     .prosperity-button:hover { transform: scale(1.1); }
     
@@ -155,7 +162,7 @@
     #customModalCancel:hover { background: #555; transform: scale(1.05); }
     #customModalCancel.hidden { display: none; }
     
-    /* Garante transparência absoluta no Canvas e na Cena do A-Frame */
+    /* Sincronização estrutural de opacidade do canvas 3D */
     a-scene, a-canvas, .a-canvas {
       background-color: transparent !important;
       background: transparent !important;
@@ -232,14 +239,52 @@
             audio: false
           });
           videoBg.srcObject = stream;
-          videoBg.play().catch(e => console.log("Aguardando interação para play da câmera"));
+          videoBg.play().catch(e => console.log("Aguardando ativação por toque"));
         } catch (err) {
-          console.error("Erro ao abrir a webcam:", err);
+          console.error("Erro ao abrir a câmara:", err);
         }
       }
     }
 
-    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO (COM REDIRECIONAMENTO METAMASK) ---
+    // --- FUNÇÃO DO MODAL CUSTOMIZADO ---
+    function showCustomModal(message, showInput, btnCancelText, btnOkText) {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById('customModalOverlay');
+        const msgEl = document.getElementById('customModalMessage');
+        const inputEl = document.getElementById('customModalInput');
+        const btnCancel = document.getElementById('customModalCancel');
+        const btnOk = document.getElementById('customModalConfirm');
+
+        msgEl.innerText = message;
+        inputEl.value = '';
+
+        if (showInput) {
+          inputEl.classList.remove('hidden');
+          btnCancel.classList.remove('hidden');
+          setTimeout(() => inputEl.focus(), 100);
+        } else {
+          inputEl.classList.add('hidden');
+          btnCancel.classList.add('hidden');
+        }
+
+        btnCancel.innerText = btnCancelText || "Cancelar";
+        btnOk.innerText = btnOkText || "OK";
+
+        overlay.classList.remove('hidden');
+
+        const closeModal = (result) => {
+          overlay.classList.add('hidden');
+          btnOk.onclick = null;
+          btnCancel.onclick = null;
+          resolve(result);
+        };
+
+        btnOk.onclick = () => { closeModal(showInput ? inputEl.value : true); };
+        btnCancel.onclick = () => { closeModal(null); };
+      });
+    }
+
+    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO (SEM CHAVES DUPLICADAS) ---
     const translations = {
       pt: {
         videoUrl: "new/hannah2_br.mp4",
@@ -290,10 +335,10 @@
         buyPrompt: "¿Cuántos POL deseas investir en la compra de ELONBYD (Elon Musk Driving a BYD)?",
         invalidAmount: "Cantidad inválida",
         txSent: "¡Transacción enviada! Esperando a que la red Polygon confirme tu compra de ELONBYD...",
-        txSuccess: "¡Compra exitosa! Los tokens ELONBYD ya están en tu billetera.",
-        txFailed: "La transacción fue cancelada o falló. Verifica si tienes saldo suficiente de POL para la compra y las tarifas de gas.",
+        txSuccess: "¡Compra exitosa! Los tokens ELONBYD ya estão en tu billetera.",
+        txFailed: "La transacción fue cancelada o falló. Verifica si tienes saldo suficiente de POL para la compra e las tarifas de gas.",
         insufficientTokens: "No hay suficientes tokens ELONBYD en el contrato para esta compra.",
-        amountTooLow: "El valor enviado en POL es demasiado bajo para comprar la fracción mínima.",
+        amountTooLow: "El valor enviado en POL es demasiado bajo para comprar a fração mínima.",
         onlyOwner: "Solo el propietario del contrato puede realizar esta acción.",
         priceNotSet: "El precio de venda del token no ha sido configurado en el contrato.",
         sendPol: "Por favor, envíe una cantidad de POL mayor que 0 para comprar.",
@@ -335,7 +380,7 @@
         insufficientTokens: "Es gibt nicht genügend ELONBYD-Token im Vertrag für diesen Kauf.",
         amountTooLow: "Der gesendete POL-Betrag ist zu niedrig, um den Mindestanteil zu kaufen.",
         onlyOwner: "Nur der Vertragseigentümer kann diese Aktion ausführen.",
-        priceNotSet: "Der Token-Verkaufspreis wurde im Vertrag não konfiguriert.",
+        priceNotSet: "Der Token-Verkaufspreis wurde im Vertrag nicht konfiguriert.",
         sendPol: "Bitte senden Sie einen POL-Betrag größer als 0, um zu kaufen.",
         failWithdraw: "Fehler beim Abheben von Token aus dem Vertrag.",
         btnOk: "OK",
@@ -485,7 +530,10 @@
     }
 
     function configureLanguageAndTexts() {
-      const userLang = (navigator.language || navigator.userLanguage).substring(0, 2);
+      let userLang = "en";
+      try {
+        userLang = (navigator.language || navigator.userLanguage || "en").substring(0, 2);
+      } catch(e) {}
       const activeLang = translations[userLang] ? userLang : 'en';
 
       if (video) {
@@ -600,7 +648,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 COM REDIRECIONAMENTO AUTOMÁTICO DE DEEP LINK ---
+    // --- LOGÍCA WEB3 NATIVA ROBUSTA E CORRIGIDA ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -608,44 +656,48 @@
     ];
 
     buyTokenBtn.addEventListener('click', async () => {
-      const userLang = (navigator.language || navigator.userLanguage).substring(0, 2);
+      let userLang = "en";
+      try {
+        userLang = (navigator.language || navigator.userLanguage || "en").substring(0, 2);
+      } catch(e) {}
       const activeLang = translations[userLang] ? userLang : 'en';
       const langText = translations[activeLang];
 
-      // SE NÃO DETECTAR CARTEIRA INSTALADA (Safari, Chrome comum, etc)
+      // SE NÃO FOR DETECTADA A EXTENSÃO INJETADA (Ex: Safari/Chrome comum)
       if (typeof window.ethereum === 'undefined') {
-        // Mostra o modal customizado elegante informando o usuário
         await showCustomModal(langText.web3Missing, false, "", langText.btnOk);
-        
-        // Executa o Deep Link para abrir o app da MetaMask e carregar o seu link na mesma hora
         const dappUrl = window.location.href.replace('https://', '').replace('http://', '');
         window.location.href = "https://metamask.app.link/dapp/" + dappUrl;
         return;
       }
 
       try {
+        // Feedback visual imediato e bloqueio de cliques duplos
         buyTokenBtn.innerHTML = "⏳";
         buyTokenBtn.style.pointerEvents = "none";
 
+        // Comunicação 100% nativa direta EIP-1193 exigida pela MetaMask Mobile
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
         const signer = provider.getSigner();
 
-        const targetNetworkId = '0x89'; 
-        const { chainId } = await provider.getNetwork();
+        // Obtém o Chain ID nativo via RPC direto
+        const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
+        const chainId = parseInt(chainIdHex, 16);
         
         if (chainId !== 137) {
           try {
             await window.ethereum.request({
               method: 'wallet_switchEthereumChain',
-              params: [{ chainId: targetNetworkId }],
+              params: [{ chainId: '0x89' }],
             });
           } catch (switchError) {
             if (switchError.code === 4902) {
               await window.ethereum.request({
                 method: 'wallet_addEthereumChain',
                 params: [{
-                  chainId: targetNetworkId,
+                  chainId: '0x89',
                   chainName: 'Polygon Mainnet',
                   rpcUrls: ['https://polygon-rpc.com/'],
                   nativeCurrency: { name: 'POL', symbol: 'POL', decimals: 18 },
@@ -658,43 +710,48 @@
           }
         }
 
+        // Abre a caixa de diálogo customizada para o valor da transação
         const polAmount = await showCustomModal(langText.buyPrompt, true, langText.btnCancel, langText.btnOk);
         
         if (!polAmount || isNaN(polAmount) || parseFloat(polAmount) <= 0) {
-          throw new Error(langText.invalidAmount);
+          // Cancelado pelo usuário, sai de forma limpa
+          buyTokenBtn.innerHTML = "$";
+          buyTokenBtn.style.pointerEvents = "auto";
+          return;
         }
 
         const contract = new ethers.Contract(CONTRATO_VENDA_ADDRESS, CONTRATO_VENDA_ABI, signer);
         const valorEmWei = ethers.utils.parseEther(polAmount);
 
+        // Dispara a chamada do contrato inteligente
         const tx = await contract.buyTokens({ value: valorEmWei });
         
-        showCustomModal(langText.txSent, false, "", langText.btnOk);
+        await showCustomModal(langText.txSent, false, "", langText.btnOk);
         
         await tx.wait();
-        showCustomModal(langText.txSuccess, false, "", langText.btnOk);
+        await showCustomModal(langText.txSuccess, false, "", langText.btnOk);
 
       } catch (error) {
-        console.error("Erro detectado na transacao:", error);
+        console.error("Erro detectado na transação:", error);
         
-        const errorMessage = error.toString() || "";
+        const errorString = error.message || error.toString() || "";
 
-        if (errorMessage.includes("Nao ha tokens suficientes")) {
-          showCustomModal(langText.insufficientTokens, false, "", langText.btnOk);
-        } else if (errorMessage.includes("Valor enviado e muito baixo")) {
-          showCustomModal(langText.amountTooLow, false, "", langText.btnOk);
-        } else if (errorMessage.includes("Apenas o dono")) {
-          showCustomModal(langText.onlyOwner, false, "", langText.btnOk);
-        } else if (errorMessage.includes("Preco nao configurado")) {
-          showCustomModal(langText.priceNotSet, false, "", langText.btnOk);
-        } else if (errorMessage.includes("Envie POL para comprar")) {
-          showCustomModal(langText.sendPol, false, "", langText.btnOk);
-        } else if (errorMessage.includes("Falha ao retirar tokens")) {
-          showCustomModal(langText.failWithdraw, false, "", langText.btnOk);
-        } else if (error.message === translations[userLang]?.invalidAmount || error.message === translations['en'].invalidAmount) {
-          // Cancelado pelo usuário
+        if (errorString.includes("Nao ha tokens suficientes")) {
+          await showCustomModal(langText.insufficientTokens, false, "", langText.btnOk);
+        } else if (errorString.includes("Valor enviado e muito baixo")) {
+          await showCustomModal(langText.amountTooLow, false, "", langText.btnOk);
+        } else if (errorString.includes("Apenas o dono")) {
+          await showCustomModal(langText.onlyOwner, false, "", langText.btnOk);
+        } else if (errorString.includes("Preco nao configurado")) {
+          await showCustomModal(langText.priceNotSet, false, "", langText.btnOk);
+        } else if (errorString.includes("Envie POL para comprar")) {
+          await showCustomModal(langText.sendPol, false, "", langText.btnOk);
+        } else if (errorString.includes("Falha ao retirar tokens")) {
+          await showCustomModal(langText.failWithdraw, false, "", langText.btnOk);
+        } else if (errorString.includes("Quantidade inválida") || errorString.includes("Invalid amount")) {
+          // Cancelado de forma controlada
         } else {
-          showCustomModal(langText.txFailed, false, "", langText.btnOk);
+          await showCustomModal(langText.txFailed, false, "", langText.btnOk);
         }
       } finally {
         buyTokenBtn.innerHTML = "$";
