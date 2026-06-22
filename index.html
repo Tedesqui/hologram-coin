@@ -28,7 +28,7 @@
   </script>
 
   <style>
-    /* Força transparência total nas camadas para exibição perfeita do ambiente real ao fundo */
+    /* Configuração de transparência total para permitir que a câmara apareça ao fundo */
     html, body { 
       font-family: sans-serif; 
       margin: 0; 
@@ -183,7 +183,7 @@
   <button id="playPauseButton" class="control-btn is-paused"><span class="icon">▶︎</span> <span class="text">Play</span></button>
   <button id="skipReplayButton" class="control-btn"><span class="icon">⏭︎</span> <span class="text">Skip</span></button>
 
-  <a-scene vr-mode-ui="enabled: false" loading-screen="enabled: false">
+  <a-scene renderer="alpha: true;" vr-mode-ui="enabled: false" loading-screen="enabled: false">
     <a-assets>
       <video id="Video_Asset_0" playsinline webkit-playsinline></video>
       <img id="imagem-final-asset" src="videos/hannah.jpg">
@@ -199,7 +199,7 @@
       <a-plane id="finalTextPlane" width="11" height="3" position="0 -3.2 0" material="shader: flat; transparent: true; src: #textCanvas; opacity: 1;"></a-plane>
     </a-entity>
     
-    <a-camera id="camera1" wasd-controls="enabled: false" look-controls="enabled: false"></a-camera>
+    <a-camera id="camera1" wasd-controls="enabled: false" look-controls="enabled: true"></a-camera>
   </a-scene>
 
   <div id="central-button-container">
@@ -221,7 +221,7 @@
     const initialMessage = document.getElementById('initialMessage');
     const buyTokenBtn = document.getElementById('buyTokenBtn');
 
-    // --- FUNÇÃO PARA INICIALIZAR A CÂMERA DE FORMA COMPATÍVEL ---
+    // --- INICIALIZADOR DA WEBCAM COMBINADO ---
     async function initWebcam() {
       const videoBg = document.getElementById('webcam-background');
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -237,7 +237,7 @@
       }
     }
 
-    // --- FUNÇÃO DE GERENCIAMENTO DE MODAL CUSTOMIZADO ---
+    // --- FUNÇÃO DO MODAL CUSTOMIZADO ---
     function showCustomModal(message, showInput, btnCancelText, btnOkText) {
       return new Promise((resolve) => {
         const overlay = document.getElementById('customModalOverlay');
@@ -329,7 +329,7 @@
         txSuccess: "¡Compra exitosa! Los tokens ELONBYD ya están en tu billetera.",
         txFailed: "La transacción fue cancelada o falló. Verifica si tienes saldo suficiente de POL para la compra y las tarifas de gas.",
         insufficientTokens: "No hay suficientes tokens ELONBYD en el contrato para esta compra.",
-        amountTooLow: "El valor enviado en POL es demasiado bajo para comprar a fracción mínima.",
+        amountTooLow: "El valor enviado en POL es demasiado bajo para comprar la fracción mínima.",
         onlyOwner: "Solo el propietario del contrato puede realizar esta acción.",
         priceNotSet: "El precio de venta del token no ha sido configurado en el contrato.",
         sendPol: "Por favor, envíe una cantidad de POL mayor que 0 para comprar.",
@@ -559,7 +559,6 @@
       }
     }
 
-    // Lógica do botão Play/Pause (Corrigido permanente)
     playPauseButton.addEventListener('click', () => {
       showOneSignalPrompt();
 
@@ -585,7 +584,6 @@
       }
     });
 
-    // Lógica do botão Skip/Replay
     skipReplayButton.addEventListener('click', () => {
       showOneSignalPrompt();
 
@@ -724,7 +722,7 @@
         } else if (errorMessage.includes("Falha ao retirar tokens")) {
           showCustomModal(langText.failWithdraw, false, "", langText.btnOk);
         } else if (error.message === translations[userLang]?.invalidAmount || error.message === translations['en'].invalidAmount) {
-          // Operação abortada sem erros extras
+          // Operação abortada de forma limpa pelo usuário
         } else {
           showCustomModal(langText.txFailed, false, "", langText.btnOk);
         }
@@ -737,7 +735,7 @@
     window.addEventListener('load', () => {
       configureLanguageAndTexts();
       checkIOSInstallation();
-      initWebcam(); // Inicializa a câmera nativa sob o canvas 3D
+      initWebcam(); 
     });
   </script>
 </body>
