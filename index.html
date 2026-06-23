@@ -12,9 +12,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌">
 
+  <!-- A-Frame para renderização 3D/VR -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
+  <!-- Ethers.js para integração Web3 nativa -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -64,7 +66,7 @@
       z-index: 1;
     }
 
-    /* Mensagem inicial padrão */
+    /* Mensagem inicial padrão (Centralizada levemente para baixo) */
     #initialMessage { 
       position: fixed; 
       top: calc(50% + 100px); 
@@ -80,13 +82,15 @@
       max-width: 90%; 
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
       pointer-events: none; 
+      transition: all 0.3s ease;
     }
 
-    /* CORREÇÃO DO IPHONE: Move a mensagem para baixo para não tapar o aviso de sensores do iOS */
+    /* CORREÇÃO DEFINITIVA DO IPHONE: Move a mensagem para o ALTO (abaixo da área da hora/notch) */
     .is-iphone #initialMessage {
-      top: auto !important;
-      bottom: 180px !important;
-      transform: translateX(-50%) !important;
+      top: env(safe-area-inset-top, 20px) !important; /* Começa logo abaixo do notch/área de status */
+      margin-top: 10px !important; /* Dá um espacinho visual adicional para o alto */
+      bottom: auto !important; /* Garante que não use configurações antigas de baixo */
+      transform: translateX(-50%) !important; /* Centraliza horizontalmente, mantém vertical fixo no topo */
     }
     
     /* Configuração geral dos botões de controle */
@@ -198,11 +202,13 @@
 </head>
 
 <body>
+  <!-- Elemento de captura da Câmera Real em Background -->
   <video id="webcam-background" autoplay playsinline muted></video>
 
   <div id="iosInstallPrompt"></div>
   <div id="initialMessage"></div>
   
+  <!-- MODAL CUSTOMIZADO -->
   <div id="customModalOverlay" class="hidden">
     <div id="customModalBox">
       <h3 id="customModalTitle">Hologram Coin</h3>
@@ -225,6 +231,7 @@
       <canvas id="textCanvas" width="2048" height="512" style="display:none;"></canvas>
     </a-assets>
     
+    <!-- Proporções originais quadradas mantidas (5x5) -->
     <a-entity id="video-inicial-entity" position="0 1 -8" visible="true">
       <a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0;"></a-video>
     </a-entity>
@@ -256,7 +263,7 @@
     const initialMessage = document.getElementById('initialMessage');
     const buyTokenBtn = document.getElementById('buyTokenBtn');
 
-    // --- INICIALIZADOR DA WEBCAM NATIVA COM SUPORTE AO SAFARI ---
+    // --- INICIALIZADOR DA WEBCAM NATIVA ---
     async function initWebcam() {
       const videoBg = document.getElementById('webcam-background');
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -268,7 +275,7 @@
           videoBg.srcObject = stream;
           
           videoBg.play().catch(e => {
-            console.log("Safari bloqueou o autoplay. Aguardando o primeiro toque na tela para abrir a câmera.");
+            console.log("Safari bloqueou o autoplay. Aguardando interação da tela para permissão de vídeo...");
             document.body.addEventListener('click', () => {
               videoBg.play();
             }, { once: true });
@@ -313,6 +320,7 @@
         };
 
         btnOk.onclick = () => { 
+          // Executa redirecionamento de imediato no clique (Chrome/Android/Brave), burlando o bloqueio assíncrono
           if(redirectUrl) {
             window.location.href = redirectUrl;
           }
@@ -372,7 +380,7 @@
         initial: "Apunta tu teléfono hacia adelante para ver el video, luego haz clic en Play.",
         ios: `Para recibir notificaciones de alta prioridad, toca en <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> y selecciona <strong>"Añadir a la pantalla de inicio"</strong>.`,
         finalText: "¡¡¡COMPRA A ELON MUSK CONDUCIENDO UN BYD AHORA!!!\n¡¡¡HAZ CLIC EN EL BOTON $ !!!",
-        web3Missing: "Para comprar, abriremos el navegador seguro dentro de tu aplicación MetaMask. Haz clic en OK para abrir.",
+        web3Missing: "Para comprar, abriremos el navegador seguro dentro de tu aplicação MetaMask. Haz clic en OK para abrir.",
         web3MissingSafari: "Para comprar ELONBYD, copie y abra este sitio en el navegador de una billetera Web3 (como MetaMask o Trust Wallet).",
         buyPrompt: "¿Cuántos POL deseas investir en la compra de ELONBYD (Elon Musk Driving a BYD)?",
         invalidAmount: "Cantidad inválida",
@@ -420,11 +428,11 @@
         invalidAmount: "Ungültiger Betrag",
         txSent: "Transaktion gesendet! Warten auf die Bestätigung Ihres ELONBYD-Kaufs durch das Polygon-Netzwerk...",
         txSuccess: "Kauf erfolgreich! Die ELONBYD-Token befinden sich jetzt in Ihrem Wallet.",
-        txFailed: "Die Transaktion wurde abgebrochen oder ist fehlgeschlagen. Bitte überprüfen Sie, ob Sie genügend POL-Guthaben für den Kauf und die Gasgebühren haben.",
+        txFailed: "Die Transaktion wurde abgebrochen or ist fehlgeschlagen. Bitte überprüfen Sie, ob Sie genügend POL-Guthaben für den Kauf und die Gasgebühren haben.",
         insufficientTokens: "Es gibt nicht genügend ELONBYD-Token im Vertrag für diesen Kauf.",
         amountTooLow: "Der gesendete POL-Betrag ist zu niedrig, um den Mindestanteil zu kaufen.",
         onlyOwner: "Nur der Vertragseigentümer kann diese Aktion ausführen.",
-        priceNotSet: "Der Token-Verkaufspreis wurde im Vertrag nicht konfiguriert.",
+        priceNotSet: "Der Token-Verkaufspreis wurde im Vertrag não konfiguriert.",
         sendPol: "Bitte senden Sie einen POL-Betrag größer als 0, um zu kaufen.",
         failWithdraw: "Fehler beim Abheben von Token aus dem Vertrag.",
         btnOk: "OK",
@@ -454,9 +462,9 @@
       ko: {
         videoUrl: "new/hannah2_ko.mp4",
         initial: "동영상을 시청하려면 휴대폰을 앞쪽으로 향하게 한 다음 재생(Play)을 클릭하세요.",
-        ios: `높은 우선순위 알림을 받으려면 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>을 누르고 <strong>'홈 화면에 추가'</strong>를 선택하세요.`,
+        ios: `높은 우선순위 알림을 받으려면 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>을 누르고 <strong>'홈 화면에 추가'</strong>を 선택하세요.`,
         finalText: "지금 BYD를 운전하는 일론 머스크를 구매하세요!!!\n$ 버튼을 클릭하세요!!!",
-        web3Missing: "구매하려면 MetaMask 앱 내부의 안전한 브라우저를 열겠습니다. 열려면 OK를 클릭하세요.",
+        web3Missing: "구매하려면 MetaMask 앱 내부の 안전한 브라우저를 열겠습니다. 열려면 OK를 클릭하세요.",
         web3MissingSafari: "ELONBYD를 구매하려면 이 사이트를 복사하여 Web3 지갑(MetaMask 또는 Trust Wallet 등) 브라우저에서 여세요.",
         buyPrompt: "ELONBYD(Elon Musk Driving a BYD) 구매에 몇 POL을 투자하시겠습니까?",
         invalidAmount: "잘못된 금액입니다",
@@ -496,7 +504,7 @@
       ru: {
         videoUrl: "new/hannah2_ru.mp4",
         initial: "Направьте телефон вперед, чтобы посмотреть видео, затем нажмите Play.",
-        ios: `Чтобы получать уведомления высокого приоритета, нажмите <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> и выберите <strong>«Добавить на главный экран»</strong>.`,
+        ios: `Чтобы получать уведомления высокого приоритета, нажмите <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> i выберите <strong>«Добавить на главный экран»</strong>.`,
         finalText: "КУПИТЕ ИЛОНА МАСКА, УПРАВЛЯЮЩЕГО BYD, СЕЙЧАС!!!\nНАЖМИТЕ КНОПКУ $ !!!",
         web3Missing: "Чтобы купить, мы откроем безопасный браузер внутри вашего приложения MetaMask. Нажмите ОК, чтобы открыть.",
         web3MissingSafari: "Чтобы купить ELONBYD, скопируйте и откройте этот сайт в браузере кошелька Web3 (например, MetaMask или Trust Wallet).",
@@ -696,7 +704,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 COM DETECÇÃO INTELIGENTE DE NAVEGADOR ---
+    // --- LOGÍCA WEB3 COM DEEP LINKING DA METAMASK ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -712,18 +720,9 @@
       const langText = translations[activeLang];
 
       if (typeof window.ethereum === 'undefined') {
-        const userAgent = navigator.userAgent.toLowerCase();
-        const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
-
-        if (isSafari) {
-          // No Safari: Apenas exibe o aviso, sem forçar o redirecionamento.
-          await showCustomModal(langText.web3MissingSafari, false, "", langText.btnOk);
-        } else {
-          // No Chrome/Outros: Monta o Deep Link e executa o redirecionamento no clique do "OK".
-          const dappUrl = window.location.href.replace(/^https?:\/\//, '');
-          const metaMaskDeepLink = "https://metamask.app.link/dapp/" + dappUrl;
-          showCustomModal(langText.web3Missing, false, "", langText.btnOk, metaMaskDeepLink);
-        }
+        const dappUrl = window.location.href.replace(/^https?:\/\//, '');
+        const metaMaskDeepLink = "https://metamask.app.link/dapp/" + dappUrl;
+        showCustomModal(langText.web3Missing, false, "", langText.btnOk, metaMaskDeepLink);
         return;
       }
 
