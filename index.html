@@ -7,9 +7,10 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-  <meta name="description" id="meta-desc" content="Ganhe muito dinheiro comprando novos tokens holográficos!!!">
+  <!-- Meta Tags para Prévia no WhatsApp, Telegram, Facebook (TEXTO FIXO EM INGLÊS) -->
+  <meta name="description" id="meta-desc" content="Earn a lot of money buying new holographic tokens!!!">
   <meta property="og:title" content="𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌 𝐂𝐎𝐈𝐍">
-  <meta property="og:description" id="og-desc" content="Ganhe muito dinheiro comprando novos tokens holográficos!!!">
+  <meta property="og:description" id="og-desc" content="Earn a lot of money buying new holographic tokens!!!">
   <meta property="og:image" content="icone.png">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
@@ -19,9 +20,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌">
 
+  <!-- A-Frame para renderização 3D/VR -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
+  <!-- Ethers.js para integração Web3 nativa -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -71,7 +74,7 @@
       z-index: 1;
     }
 
-    /* Mensagem inicial padrão (Centralizada levemente para baixo) */
+    /* Mensagem inicial padrão */
     #initialMessage { 
       position: fixed; 
       top: calc(50% + 100px); 
@@ -90,7 +93,7 @@
       transition: all 0.3s ease;
     }
 
-    /* CORREÇÃO DEFINITIVA DO IPHONE: Move a mensagem para o ALTO (abaixo da área da hora/notch) */
+    /* CORREÇÃO DO IPHONE: Move a mensagem para o ALTO */
     .is-iphone #initialMessage {
       top: env(safe-area-inset-top, 20px) !important; 
       margin-top: 10px !important; 
@@ -198,7 +201,6 @@
     #customModalCancel:hover { background: #555; transform: scale(1.05); }
     #customModalCancel.hidden { display: none; }
     
-    /* Garante transparência absoluta no Canvas e na Cena do A-Frame */
     a-scene, a-canvas, .a-canvas {
       background-color: transparent !important;
       background: transparent !important;
@@ -207,11 +209,13 @@
 </head>
 
 <body>
+  <!-- Elemento de captura da Câmera Real em Background -->
   <video id="webcam-background" autoplay playsinline muted></video>
 
   <div id="iosInstallPrompt"></div>
   <div id="initialMessage"></div>
   
+  <!-- MODAL CUSTOMIZADO -->
   <div id="customModalOverlay" class="hidden">
     <div id="customModalBox">
       <h3 id="customModalTitle">Hologram Coin</h3>
@@ -730,7 +734,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 ---
+    // --- LOGÍCA WEB3 COM REDIRECIONAMENTO E VERIFICAÇÃO DE SUCESSO DE IMPORTAÇÃO ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -813,6 +817,7 @@
         await tx.wait();
         await showCustomModal(langText.txSuccess, false, "", langText.btnOk);
 
+        // SUGERE A ADIÇÃO AUTOMÁTICA DO TOKEN NA CARTEIRA E TRATA REJEIÇÃO
         try {
           const wasAdded = await window.ethereum.request({
             method: 'wallet_watchAsset',
@@ -863,6 +868,7 @@
       }
     });
 
+    // Detecta iPhone e aplica classe corretiva
     window.addEventListener('load', () => {
       configureLanguageAndTexts();
       checkIOSInstallation();
