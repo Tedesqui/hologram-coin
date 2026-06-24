@@ -7,6 +7,13 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
+  <meta name="description" id="meta-desc" content="Ganhe muito dinheiro comprando novos tokens holográficos!!!">
+  <meta property="og:title" content="𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌 𝐂𝐎𝐈𝐍">
+  <meta property="og:description" id="og-desc" content="Ganhe muito dinheiro comprando novos tokens holográficos!!!">
+  <meta property="og:image" content="icone.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+
   <link rel="apple-touch-icon" href="icone.png">
   <link rel="icon" type="image/png" href="icone.png">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -64,7 +71,7 @@
       z-index: 1;
     }
 
-    /* Mensagem inicial padrão */
+    /* Mensagem inicial padrão (Centralizada levemente para baixo) */
     #initialMessage { 
       position: fixed; 
       top: calc(50% + 100px); 
@@ -83,7 +90,7 @@
       transition: all 0.3s ease;
     }
 
-    /* CORREÇÃO DO IPHONE: Move a mensagem para o ALTO */
+    /* CORREÇÃO DEFINITIVA DO IPHONE: Move a mensagem para o ALTO (abaixo da área da hora/notch) */
     .is-iphone #initialMessage {
       top: env(safe-area-inset-top, 20px) !important; 
       margin-top: 10px !important; 
@@ -191,6 +198,7 @@
     #customModalCancel:hover { background: #555; transform: scale(1.05); }
     #customModalCancel.hidden { display: none; }
     
+    /* Garante transparência absoluta no Canvas e na Cena do A-Frame */
     a-scene, a-canvas, .a-canvas {
       background-color: transparent !important;
       background: transparent !important;
@@ -325,13 +333,14 @@
       });
     }
 
-    // --- DICIONÁRIO DE TRADUÇÕES COM BOTÕES DE COPIAR EMBUTIDOS ---
+    // --- DICIONÁRIO DE TRADUÇÕES ---
     const translations = {
       pt: {
+        metaSubtitle: "Ganhe muito dinheiro comprando novos tokens holográficos!!!",
         videoUrl: "new/hannah2_br.mp4",
         initial: "Aponte o celular para frente para assistir ao vídeo e clique em Play.",
         ios: `Para receber notificações de altíssima prioridade, toque em <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> e selecione <strong>"Adicionar à Tela de Início"</strong>.`,
-        finalText: "COMPRE ELON MUSK DIRIGINDO UM BYD AGORA!!!\nGanhe muito dinheiro comprando novos tokens holográficos!!!\nCLIQUE NO BOTAO $ !!!",
+        finalText: "COMPRE ELON MUSK DIRIGINDO UM BYD AGORA!!!\nCLIQUE NO BOTAO $ !!!",
         web3Missing: "Para comprar, vamos abrir o navegador seguro no aplicativo da sua carteira MetaMask. Clique em OK para abrir.",
         web3MissingSafari: "Para comprar ELONBYD, copie e abra este site no navegador de uma carteira Web3 (como MetaMask ou Trust Wallet).",
         buyPrompt: "Quantos POL deseja investir na compra de ELONBYD (Elon Musk Driving a BYD)?",
@@ -350,10 +359,11 @@
         btnCancel: "Cancelar"
       },
       en: {
+        metaSubtitle: "Earn a lot of money buying new holographic tokens!!!",
         videoUrl: "new/hannah2.mp4",
         initial: "Point your phone forward to watch the video, then click Play.",
         ios: `To receive high-priority notifications, tap <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> and select <strong>"Add to Home Screen"</strong>.`,
-        finalText: "BUY ELON MUSK DRIVING A BYD NOW!!!\nEarn a lot of money buying new holographic tokens!!!\nCLICK THE $ BUTTON!!!",
+        finalText: "BUY ELON MUSK DRIVING A BYD NOW!!!\nCLICK THE $ BUTTON!!!",
         web3Missing: "To buy, we will open the secure browser inside your MetaMask app. Click OK to open.",
         web3MissingSafari: "To buy ELONBYD, please copy and open this site in a Web3 wallet browser (like MetaMask or Trust Wallet).",
         buyPrompt: "How many POL do you want to invest in buying ELONBYD (Elon Musk Driving a BYD)?",
@@ -372,10 +382,11 @@
         btnCancel: "Cancel"
       },
       es: {
+        metaSubtitle: "¡Gana mucho dinero comprando nuevos tokens holográficos!",
         videoUrl: "new/hannah2_es.mp4",
         initial: "Apunta tu teléfono hacia adelante para ver el video, luego haz clic en Play.",
         ios: `Para recibir notificaciones de alta prioridad, toca en <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> y selecciona <strong>"Añadir a la pantalla de inicio"</strong>.`,
-        finalText: "¡¡¡COMPRA A ELON MUSK CONDUCIENDO UN BYD AHORA!!!\n¡Gana mucho dinero comprando nuevos tokens holográficos!\n¡¡¡HAZ CLIC EN EL BOTON $ !!!",
+        finalText: "¡¡¡COMPRA A ELON MUSK CONDUCIENDO UN BYD AHORA!!!\n¡¡¡HAZ CLIC EN EL BOTON $ !!!",
         web3Missing: "Para comprar, abriremos el navegador seguro dentro de tu aplicación MetaMask. Haz clic en OK para abrir.",
         web3MissingSafari: "Para comprar ELONBYD, copie y abra este sitio en el navegador de una billetera Web3 (como MetaMask o Trust Wallet).",
         buyPrompt: "¿Cuántos POL deseas investir en la compra de ELONBYD (Elon Musk Driving a BYD)?",
@@ -394,10 +405,11 @@
         btnCancel: "Cancelar"
       },
       fr: {
+        metaSubtitle: "Gagnez beaucoup d'argent en achetant de nouveaux jetons holographiques !!!",
         videoUrl: "new/hannah2_fr.mp4",
         initial: "Pointez votre téléphone vers l'avant pour regarder la vidéo, puis cliquez sur Play.",
         ios: `Pour recevoir des notifications de haute priorité, appuyez sur <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> et sélectionnez <strong>"Sur l'écran d'accueil"</strong>.`,
-        finalText: "ACHETEZ ELON MUSK CONDUISANT UNE BYD MAINTENANT !!!\nGagnez beaucoup d'argent en achetant de nouveaux jetons holographiques !!!\nCLIQUEZ SUR LE BOUTON $ !!!",
+        finalText: "ACHETEZ ELON MUSK CONDUISANT UNE BYD MAINTENANT !!!\nCLIQUEZ SUR LE BOUTON $ !!!",
         web3Missing: "Pour acheter, nous allons ouvrir le navigateur sécurisé dans votre application MetaMask. Cliquez sur OK pour ouvrir.",
         web3MissingSafari: "Pour acheter ELONBYD, veuillez copier et ouvrir ce site dans le navigateur d'un portefeuille Web3 (comme MetaMask ou Trust Wallet).",
         buyPrompt: "Combien de POL souhaitez-vous investir dans l'achat d'ELONBYD (Elon Musk Driving a BYD) ?",
@@ -416,10 +428,11 @@
         btnCancel: "Annuler"
       },
       de: {
+        metaSubtitle: "Verdienen Sie viel Geld mit neuen holographischen Token!!!",
         videoUrl: "new/hannah2_de.mp4",
         initial: "Richten Sie Ihr Telefon nach vorne, um das Video anzusehen, und klicken Sie auf Play.",
         ios: `Um Benachrichtigungen mit hoher Priorität zu erhalten, tippen Sie auf <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> und wählen Sie <strong>"Zum Home-Bildschirm"</strong>.`,
-        finalText: "KAUFEN SIE ELON MUSK BEIM FAHREN EINES BYD JETZT!!!\nVerdienen Sie viel Geld mit neuen holographischen Token!!!\nKLICKEN SIE AUF DIE $-TASTE!!!",
+        finalText: "KAUFEN SIE ELON MUSK BEIM FAHREN EINES BYD JETZT!!!\nKLICKEN SIE AUF DIE $-TASTE!!!",
         web3Missing: "Um zu kaufen, öffnen wir den sicheren Browser in Ihrer MetaMask-App. Klicken Sie auf OK, um zu öffnen.",
         web3MissingSafari: "Um ELONBYD zu kaufen, kopieren Sie bitte diese Website und öffnen Sie sie in einem Web3-Wallet-Browser (wie MetaMask oder Trust Wallet).",
         buyPrompt: "Wie viele POL möchten Sie in den Kauf von ELONBYD (Elon Musk Driving a BYD) investieren?",
@@ -438,10 +451,11 @@
         btnCancel: "Abbrechen"
       },
       ja: {
+        metaSubtitle: "新しいホログラフィックトークンを買って大金を稼ぎましょう！！！",
         videoUrl: "new/hannah2_ja.mp4",
         initial: "スマートフォンを前方に向けて動画を視聴し、[Play]をクリックしてください。",
         ios: `優先度の高い通知を受け取るには、<svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>をタップして<strong>「ホーム画面に追加」</strong>を選択してください。`,
-        finalText: "今すぐBYDを運転するイーロン・マスクを購入！！！\n新しいホログラフィックトークンを買って大金を稼ぎましょう！！！\n$ ボタンをクリック！！！",
+        finalText: "今すぐBYDを運転するイーロン・マスクを購入！！！\n$ ボタンをクリック！！！",
         web3Missing: "購入するには、MetaMaskアプリ内の安全なブラウザを開きます。[OK]をクリックして開いてください。",
         web3MissingSafari: "ELONBYDを購入するには、このサイトのURLをコピーしてWeb3ウォレット（MetaMaskやTrust Walletなど）のブラウザで開いてください。",
         buyPrompt: "ELONBYD（Elon Musk Driving a BYD）の購入に何POL投資しますか？",
@@ -460,10 +474,11 @@
         btnCancel: "キャンセル"
       },
       ko: {
+        metaSubtitle: "새로운 홀로그래픽 토큰을 구매하여 많은 돈을 버세요!!!",
         videoUrl: "new/hannah2_ko.mp4",
         initial: "동영상을 시청하려면 휴대폰을 앞쪽으로 향하게 한 다음 재생(Play)을 클릭하세요.",
         ios: `높은 우선순위 알림을 받으려면 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>을 누르고 <strong>'홈 화면에 추가'</strong>를 선택하세요.`,
-        finalText: "지금 BYD를 운전하는 일론 머스크를 구매하세요!!!\n새로운 홀로그래픽 토큰을 구매하여 많은 돈을 버세요!!!\n$ 버튼을 클릭하세요!!!",
+        finalText: "지금 BYD를 운전하는 일론 머스크를 구매하세요!!!\n$ 버튼을 클릭하세요!!!",
         web3Missing: "구매하려면 MetaMask 앱 내부의 안전한 브라우저를 열겠습니다. 열려면 OK를 클릭하세요.",
         web3MissingSafari: "ELONBYD를 구매하려면 이 사이트를 복사하여 Web3 지갑(MetaMask 또는 Trust Wallet 등) 브라우저에서 여세요.",
         buyPrompt: "ELONBYD(Elon Musk Driving a BYD) 구매에 몇 POL을 투자하시겠습니까?",
@@ -482,10 +497,11 @@
         btnCancel: "취소"
       },
       zh: {
+        metaSubtitle: "购买新的全息代币赚取大量金钱！！！",
         videoUrl: "new/hannah2_zh.mp4",
         initial: "将手机向前对准以观看视频，然后点击播放（Play）。",
         ios: `要接收高优先级通知，请点击 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> 并选择<strong>“添加到主屏幕”</strong>。`,
-        finalText: "现在购买埃隆·马斯克驾驶BYD！！！\n购买新的全息代币赚取大量金钱！！！\n点击 $ 按钮！！！",
+        finalText: "现在购买埃隆·马斯克驾驶BYD！！！\n点击 $ 按钮！！！",
         web3Missing: "要购买，我们将打开您 MetaMask 应用内的安全浏览器。点击确定（OK）打开。",
         web3MissingSafari: "要购买ELONBYD，请复制并在Web3钱包（如MetaMask或Trust Wallet）的浏览器中打开此网站。",
         buyPrompt: "您想投资多少POL来购买ELONBYD (Elon Musk Driving a BYD)？",
@@ -504,10 +520,11 @@
         btnCancel: "取消"
       },
       ru: {
+        metaSubtitle: "Заработайте много денег, покупая новые голографические токены!!!",
         videoUrl: "new/hannah2_ru.mp4",
         initial: "Направьте телефон вперед, чтобы посмотреть видео, затем нажмите Play.",
         ios: `Чтобы получать уведомления высокого приоритета, нажмите <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> и выберите <strong>«Добавить на главный экран»</strong>.`,
-        finalText: "КУПИТЕ ИЛОНА МАСКА, УПРАВЛЯЮЩЕГО BYD, СЕЙЧАС!!!\nЗаработайте много денег, покупая новые голографические токены!!!\nНАЖМИТЕ КНОПКУ $ !!!",
+        finalText: "КУПИТЕ ИЛОНА МАСКА, УПРАВЛЯЮЩЕГО BYD, СЕЙЧАС!!!\nНАЖМИТЕ КНОПКУ $ !!!",
         web3Missing: "Чтобы купить, мы откроем безопасный браузер внутри вашего приложения MetaMask. Нажмите ОК, чтобы открыть.",
         web3MissingSafari: "Чтобы купить ELONBYD, скопируйте и откройте этот сайт в браузере кошелька Web3 (например, MetaMask или Trust Wallet).",
         buyPrompt: "Сколько POL вы хотите инвестировать в покупку ELONBYD (Elon Musk Driving a BYD)?",
@@ -573,16 +590,7 @@
           ctx.fillStyle = 'white';
           ctx.fillText(parts[1], startX, y);
         } else {
-          // Auto-escala dinâmica da fonte para impedir que o subtítulo exceda as bordas laterais
-          let fontSize = 64;
-          ctx.font = `bold ${fontSize}px sans-serif`;
-          let textWidth = ctx.measureText(line).width;
-          
-          if (textWidth > canvas.width - 100) {
-            fontSize = Math.floor((canvas.width - 100) / textWidth * fontSize);
-            ctx.font = `bold ${fontSize}px sans-serif`;
-          }
-          
+          ctx.font = 'bold 64px sans-serif';
           ctx.textAlign = 'center';
           ctx.fillText(line, canvas.width / 2, y);
         }
@@ -620,6 +628,12 @@
           ${translations[activeLang].ios}
         `;
       }
+
+      // Atualiza dinamicamente as Meta Tags para navegadores que executam JS (Google, Bing, etc)
+      const metaDesc = document.getElementById('meta-desc');
+      const ogDesc = document.getElementById('og-desc');
+      if (metaDesc) metaDesc.setAttribute("content", translations[activeLang].metaSubtitle);
+      if (ogDesc) ogDesc.setAttribute("content", translations[activeLang].metaSubtitle);
 
       renderRichTextToCanvas(translations[activeLang].finalText);
     }
@@ -716,7 +730,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 COM REDIRECIONAMENTO E VERIFICAÇÃO DE SUCESSO DE IMPORTAÇÃO ---
+    // --- LOGÍCA WEB3 ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -799,7 +813,6 @@
         await tx.wait();
         await showCustomModal(langText.txSuccess, false, "", langText.btnOk);
 
-        // SUGERE A ADIÇÃO AUTOMÁTICA DO TOKEN NA CARTEIRA E TRATA REJEIÇÃO
         try {
           const wasAdded = await window.ethereum.request({
             method: 'wallet_watchAsset',
@@ -850,7 +863,6 @@
       }
     });
 
-    // Detecta iPhone e aplica classe corretiva
     window.addEventListener('load', () => {
       configureLanguageAndTexts();
       checkIOSInstallation();
