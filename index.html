@@ -12,11 +12,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="𝐇𝐎𝐋𝐎𝐆𝐑𝐀𝐌">
 
-  <!-- A-Frame para renderização 3D/VR -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
-  <!-- Ethers.js para integração Web3 nativa -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -66,7 +64,7 @@
       z-index: 1;
     }
 
-    /* Mensagem inicial padrão (Centralizada levemente para baixo) */
+    /* Mensagem inicial padrão */
     #initialMessage { 
       position: fixed; 
       top: calc(50% + 100px); 
@@ -85,12 +83,12 @@
       transition: all 0.3s ease;
     }
 
-    /* CORREÇÃO DEFINITIVA DO IPHONE: Move a mensagem para o ALTO (abaixo da área da hora/notch) */
+    /* CORREÇÃO DO IPHONE: Move a mensagem para o ALTO */
     .is-iphone #initialMessage {
-      top: env(safe-area-inset-top, 20px) !important; /* Começa logo abaixo do notch/área de status */
-      margin-top: 10px !important; /* Dá um espacinho visual adicional para o alto */
-      bottom: auto !important; /* Garante que não use configurações antigas de baixo */
-      transform: translateX(-50%) !important; /* Centraliza horizontalmente, mantém vertical fixo no topo */
+      top: env(safe-area-inset-top, 20px) !important; 
+      margin-top: 10px !important; 
+      bottom: auto !important; 
+      transform: translateX(-50%) !important; 
     }
     
     /* Configuração geral dos botões de controle */
@@ -174,7 +172,7 @@
     }
     #customModalOverlay.hidden #customModalBox { transform: translateY(30px); }
     #customModalTitle { margin: 0 0 15px 0; font-size: 22px; font-weight: bold; color: #28a745; text-transform: uppercase; letter-spacing: 1px;}
-    #customModalMessage { margin: 0 0 20px 0; font-size: 16px; line-height: 1.5; color: #ccc; }
+    #customModalMessage { margin: 0 0 20px 0; font-size: 15px; line-height: 1.5; color: #ccc; word-break: break-word; }
     #customModalInput {
       width: 90%; padding: 14px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #444;
       background: #111; color: #fff; font-size: 18px; text-align: center; outline: none;
@@ -193,7 +191,6 @@
     #customModalCancel:hover { background: #555; transform: scale(1.05); }
     #customModalCancel.hidden { display: none; }
     
-    /* Garante transparência absoluta no Canvas e na Cena do A-Frame */
     a-scene, a-canvas, .a-canvas {
       background-color: transparent !important;
       background: transparent !important;
@@ -202,13 +199,11 @@
 </head>
 
 <body>
-  <!-- Elemento de captura da Câmera Real em Background -->
   <video id="webcam-background" autoplay playsinline muted></video>
 
   <div id="iosInstallPrompt"></div>
   <div id="initialMessage"></div>
   
-  <!-- MODAL CUSTOMIZADO -->
   <div id="customModalOverlay" class="hidden">
     <div id="customModalBox">
       <h3 id="customModalTitle">Hologram Coin</h3>
@@ -231,7 +226,6 @@
       <canvas id="textCanvas" width="2048" height="512" style="display:none;"></canvas>
     </a-assets>
     
-    <!-- Proporções originais quadradas mantidas (5x5) -->
     <a-entity id="video-inicial-entity" position="0 1 -8" visible="true">
       <a-video width="5" height="5" material="shader: flat; src: #Video_Asset_0;"></a-video>
     </a-entity>
@@ -286,7 +280,7 @@
       }
     }
 
-    // --- FUNÇÃO DO MODAL CUSTOMIZADO (COM SUPORTE A REDIRECIONAMENTO DIRETO) ---
+    // --- FUNÇÃO DO MODAL CUSTOMIZADO (ATUALIZADA PARA innerHTML) ---
     function showCustomModal(message, showInput, btnCancelText, btnOkText, redirectUrl = null) {
       return new Promise((resolve) => {
         const overlay = document.getElementById('customModalOverlay');
@@ -295,7 +289,8 @@
         const btnCancel = document.getElementById('customModalCancel');
         const btnOk = document.getElementById('customModalConfirm');
 
-        msgEl.innerText = message;
+        // Renderiza HTML interno para permitir botões e destaques de código
+        msgEl.innerHTML = message;
         inputEl.value = '';
 
         if (showInput) {
@@ -320,7 +315,6 @@
         };
 
         btnOk.onclick = () => { 
-          // Executa redirecionamento de imediato no clique (Chrome/Android/Brave), burlando o bloqueio assíncrono
           if(redirectUrl) {
             window.location.href = redirectUrl;
           }
@@ -331,19 +325,20 @@
       });
     }
 
-    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO ---
+    // --- DICIONÁRIO DE TRADUÇÕES COM BOTÕES DE COPIAR EMBUTIDOS ---
     const translations = {
       pt: {
         videoUrl: "new/hannah2_br.mp4",
         initial: "Aponte o celular para frente para assistir ao vídeo e clique em Play.",
         ios: `Para receber notificações de altíssima prioridade, toque em <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> e selecione <strong>"Adicionar à Tela de Início"</strong>.`,
-        finalText: "COMPRE ELON MUSK DIRIGINDO UM BYD AGORA!!!\nCLIQUE NO BOTAO $ !!!",
+        finalText: "COMPRE ELON MUSK DIRIGINDO UM BYD AGORA!!!\nGanhe muito dinheiro comprando novos tokens holográficos!!!\nCLIQUE NO BOTAO $ !!!",
         web3Missing: "Para comprar, vamos abrir o navegador seguro no aplicativo da sua carteira MetaMask. Clique em OK para abrir.",
         web3MissingSafari: "Para comprar ELONBYD, copie e abra este site no navegador de uma carteira Web3 (como MetaMask ou Trust Wallet).",
         buyPrompt: "Quantos POL deseja investir na compra de ELONBYD (Elon Musk Driving a BYD)?",
         invalidAmount: "Quantidade inválida",
         txSent: "Transação enviada! Aguardando a rede Polygon confirmar a sua compra de ELONBYD...",
         txSuccess: "Compra realizada com sucesso! Os tokens ELONBYD já estão na sua carteira.",
+        tokenRejected: "Os tokens estão na sua conta, mas você recusou a exibição automática. Para vê-los, importe manualmente o contrato:<br><br><span style='user-select:all; background:#000; padding:6px; border-radius:4px; font-family:monospace; font-size:12px; color:#28a745; display:block; word-break:break-all;'>0x40Eb407C788e62913042eCd00618F03b39F2A551</span><br><button onclick=\"navigator.clipboard.writeText('0x40Eb407C788e62913042eCd00618F03b39F2A551'); this.innerText='✔ Copiado!'; setTimeout(()=>this.innerText='📋 Copiar Endereço',2000)\" style='padding:8px 15px; background:#444; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:100%;'>📋 Copiar Endereço</button>",
         txFailed: "A transação foi cancelada ou falhou. Verifique se você tem saldo suficiente de POL para a compra e para a taxa de gás.",
         insufficientTokens: "Não há tokens ELONBYD suficientes no contrato para esta compra.",
         amountTooLow: "O valor enviado em POL é muito baixo para comprar a fração mínima.",
@@ -358,13 +353,14 @@
         videoUrl: "new/hannah2.mp4",
         initial: "Point your phone forward to watch the video, then click Play.",
         ios: `To receive high-priority notifications, tap <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> and select <strong>"Add to Home Screen"</strong>.`,
-        finalText: "BUY ELON MUSK DRIVING A BYD NOW!!!\nCLICK THE $ BUTTON!!!",
+        finalText: "BUY ELON MUSK DRIVING A BYD NOW!!!\nEarn a lot of money buying new holographic tokens!!!\nCLICK THE $ BUTTON!!!",
         web3Missing: "To buy, we will open the secure browser inside your MetaMask app. Click OK to open.",
         web3MissingSafari: "To buy ELONBYD, please copy and open this site in a Web3 wallet browser (like MetaMask or Trust Wallet).",
         buyPrompt: "How many POL do you want to invest in buying ELONBYD (Elon Musk Driving a BYD)?",
         invalidAmount: "Invalid amount",
         txSent: "Transaction sent! Waiting for the Polygon network to confirm your ELONBYD purchase...",
         txSuccess: "Purchase successful! The ELONBYD tokens are now in your wallet.",
+        tokenRejected: "Tokens are in your account, but you declined auto-display. To see them, manually import the contract:<br><br><span style='user-select:all; background:#000; padding:6px; border-radius:4px; font-family:monospace; font-size:12px; color:#28a745; display:block; word-break:break-all;'>0x40Eb407C788e62913042eCd00618F03b39F2A551</span><br><button onclick=\"navigator.clipboard.writeText('0x40Eb407C788e62913042eCd00618F03b39F2A551'); this.innerText='✔ Copied!'; setTimeout(()=>this.innerText='📋 Copy Address',2000)\" style='padding:8px 15px; background:#444; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:100%;'>📋 Copy Address</button>",
         txFailed: "The transaction was cancelled or failed. Please check if you have enough POL balance for the purchase and gas fees.",
         insufficientTokens: "There are not enough ELONBYD tokens in the contract for this purchase.",
         amountTooLow: "The amount of POL sent is too low to buy the minimum fraction.",
@@ -379,13 +375,14 @@
         videoUrl: "new/hannah2_es.mp4",
         initial: "Apunta tu teléfono hacia adelante para ver el video, luego haz clic en Play.",
         ios: `Para recibir notificaciones de alta prioridad, toca en <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> y selecciona <strong>"Añadir a la pantalla de inicio"</strong>.`,
-        finalText: "¡¡¡COMPRA A ELON MUSK CONDUCIENDO UN BYD AHORA!!!\n¡¡¡HAZ CLIC EN EL BOTON $ !!!",
-        web3Missing: "Para comprar, abriremos el navegador seguro dentro de tu aplicação MetaMask. Haz clic en OK para abrir.",
+        finalText: "¡¡¡COMPRA A ELON MUSK CONDUCIENDO UN BYD AHORA!!!\n¡Gana mucho dinero comprando nuevos tokens holográficos!\n¡¡¡HAZ CLIC EN EL BOTON $ !!!",
+        web3Missing: "Para comprar, abriremos el navegador seguro dentro de tu aplicación MetaMask. Haz clic en OK para abrir.",
         web3MissingSafari: "Para comprar ELONBYD, copie y abra este sitio en el navegador de una billetera Web3 (como MetaMask o Trust Wallet).",
         buyPrompt: "¿Cuántos POL deseas investir en la compra de ELONBYD (Elon Musk Driving a BYD)?",
         invalidAmount: "Cantidad inválida",
         txSent: "¡Transacción enviada! Esperando a que la red Polygon confirme tu compra de ELONBYD...",
         txSuccess: "¡Compra exitosa! Los tokens ELONBYD ya estão en tu billetera.",
+        tokenRejected: "Los tokens están en su cuenta, pero rechazó la visualización automática. Importe manualmente el contrato:<br><br><span style='user-select:all; background:#000; padding:6px; border-radius:4px; font-family:monospace; font-size:12px; color:#28a745; display:block; word-break:break-all;'>0x40Eb407C788e62913042eCd00618F03b39F2A551</span><br><button onclick=\"navigator.clipboard.writeText('0x40Eb407C788e62913042eCd00618F03b39F2A551'); this.innerText='✔ ¡Copiado!'; setTimeout(()=>this.innerText='📋 Copiar Dirección',2000)\" style='padding:8px 15px; background:#444; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:100%;'>📋 Copiar Dirección</button>",
         txFailed: "La transacción fue cancelada o falló. Verifica si tienes saldo suficiente de POL para la compra e las tarifas de gas.",
         insufficientTokens: "No hay suficientes tokens ELONBYD en el contrato para esta compra.",
         amountTooLow: "El valor enviado en POL es demasiado bajo para comprar a fração mínima.",
@@ -400,13 +397,14 @@
         videoUrl: "new/hannah2_fr.mp4",
         initial: "Pointez votre téléphone vers l'avant pour regarder la vidéo, puis cliquez sur Play.",
         ios: `Pour recevoir des notifications de haute priorité, appuyez sur <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> et sélectionnez <strong>"Sur l'écran d'accueil"</strong>.`,
-        finalText: "ACHETEZ ELON MUSK CONDUISANT UNE BYD MAINTENANT !!!\nCLIQUEZ SUR LE BOUTON $ !!!",
+        finalText: "ACHETEZ ELON MUSK CONDUISANT UNE BYD MAINTENANT !!!\nGagnez beaucoup d'argent en achetant de nouveaux jetons holographiques !!!\nCLIQUEZ SUR LE BOUTON $ !!!",
         web3Missing: "Pour acheter, nous allons ouvrir le navigateur sécurisé dans votre application MetaMask. Cliquez sur OK pour ouvrir.",
         web3MissingSafari: "Pour acheter ELONBYD, veuillez copier et ouvrir ce site dans le navigateur d'un portefeuille Web3 (comme MetaMask ou Trust Wallet).",
         buyPrompt: "Combien de POL souhaitez-vous investir dans l'achat d'ELONBYD (Elon Musk Driving a BYD) ?",
         invalidAmount: "Montant invalide",
         txSent: "Transaction envoyée ! En attente de la confirmation de votre achat d'ELONBYD par le réseau Polygon...",
         txSuccess: "Achat réussi ! Les jetons ELONBYD sont maintenant dans votre portefeuille.",
+        tokenRejected: "Les jetons sont sur votre compte, mais vous avez refusé l'affichage automatique. Importez manuellement le contrat:<br><br><span style='user-select:all; background:#000; padding:6px; border-radius:4px; font-family:monospace; font-size:12px; color:#28a745; display:block; word-break:break-all;'>0x40Eb407C788e62913042eCd00618F03b39F2A551</span><br><button onclick=\"navigator.clipboard.writeText('0x40Eb407C788e62913042eCd00618F03b39F2A551'); this.innerText='✔ Copié !'; setTimeout(()=>this.innerText='📋 Copier l\\'adresse',2000)\" style='padding:8px 15px; background:#444; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:100%;'>📋 Copier l'adresse</button>",
         txFailed: "La transaction a été annulée ou a échoué. Veuillez vérifier si vous avez un solde suffisant de POL pour l'achat et les frais de gaz.",
         insufficientTokens: "Il n'y a pas assez de jetons ELONBYD dans le contrat pour cet achat.",
         amountTooLow: "Le montant de POL envoyé est trop bas pour acheter la fraction minimale.",
@@ -421,18 +419,19 @@
         videoUrl: "new/hannah2_de.mp4",
         initial: "Richten Sie Ihr Telefon nach vorne, um das Video anzusehen, und klicken Sie auf Play.",
         ios: `Um Benachrichtigungen mit hoher Priorität zu erhalten, tippen Sie auf <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> und wählen Sie <strong>"Zum Home-Bildschirm"</strong>.`,
-        finalText: "KAUFEN SIE ELON MUSK BEIM FAHREN EINES BYD JETZT!!!\nKLICKEN SIE AUF DIE $-TASTE!!!",
+        finalText: "KAUFEN SIE ELON MUSK BEIM FAHREN EINES BYD JETZT!!!\nVerdienen Sie viel Geld mit neuen holographischen Token!!!\nKLICKEN SIE AUF DIE $-TASTE!!!",
         web3Missing: "Um zu kaufen, öffnen wir den sicheren Browser in Ihrer MetaMask-App. Klicken Sie auf OK, um zu öffnen.",
         web3MissingSafari: "Um ELONBYD zu kaufen, kopieren Sie bitte diese Website und öffnen Sie sie in einem Web3-Wallet-Browser (wie MetaMask oder Trust Wallet).",
         buyPrompt: "Wie viele POL möchten Sie in den Kauf von ELONBYD (Elon Musk Driving a BYD) investieren?",
         invalidAmount: "Ungültiger Betrag",
         txSent: "Transaktion gesendet! Warten auf die Bestätigung Ihres ELONBYD-Kaufs durch das Polygon-Netzwerk...",
         txSuccess: "Kauf erfolgreich! Die ELONBYD-Token befinden sich jetzt in Ihrem Wallet.",
-        txFailed: "Die Transaktion wurde abgebrochen or ist fehlgeschlagen. Bitte überprüfen Sie, ob Sie genügend POL-Guthaben für den Kauf und die Gasgebühren haben.",
+        tokenRejected: "Tokens sind auf Ihrem Konto, aber Sie haben die automatische Anzeige abgelehnt. Importieren Sie den Vertrag manuell:<br><br><span style='user-select:all; background:#000; padding:6px; border-radius:4px; font-family:monospace; font-size:12px; color:#28a745; display:block; word-break:break-all;'>0x40Eb407C788e62913042eCd00618F03b39F2A551</span><br><button onclick=\"navigator.clipboard.writeText('0x40Eb407C788e62913042eCd00618F03b39F2A551'); this.innerText='✔ Kopiert!'; setTimeout(()=>this.innerText='📋 Adresse kopieren',2000)\" style='padding:8px 15px; background:#444; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:100%;'>📋 Adresse kopieren</button>",
+        txFailed: "Die Transaktion wurde abgebrochen oder ist fehlgeschlagen. Bitte überprüfen Sie, ob Sie genügend POL-Guthaben für den Kauf und die Gasgebühren haben.",
         insufficientTokens: "Es gibt nicht genügend ELONBYD-Token im Vertrag für diesen Kauf.",
         amountTooLow: "Der gesendete POL-Betrag ist zu niedrig, um den Mindestanteil zu kaufen.",
         onlyOwner: "Nur der Vertragseigentümer kann diese Aktion ausführen.",
-        priceNotSet: "Der Token-Verkaufspreis wurde im Vertrag não konfiguriert.",
+        priceNotSet: "Der Token-Verkaufspreis wurde im Vertrag nicht konfiguriert.",
         sendPol: "Bitte senden Sie einen POL-Betrag größer als 0, um zu kaufen.",
         failWithdraw: "Fehler beim Abheben von Token aus dem Vertrag.",
         btnOk: "OK",
@@ -442,13 +441,14 @@
         videoUrl: "new/hannah2_ja.mp4",
         initial: "スマートフォンを前方に向けて動画を視聴し、[Play]をクリックしてください。",
         ios: `優先度の高い通知を受け取るには、<svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>をタップして<strong>「ホーム画面に追加」</strong>を選択してください。`,
-        finalText: "今すぐBYDを運転するイーロン・マスクを購入してください！！！\n$ ボタンをクリックしてください!!!",
+        finalText: "今すぐBYDを運転するイーロン・マスクを購入！！！\n新しいホログラフィックトークンを買って大金を稼ぎましょう！！！\n$ ボタンをクリック！！！",
         web3Missing: "購入するには、MetaMaskアプリ内の安全なブラウザを開きます。[OK]をクリックして開いてください。",
         web3MissingSafari: "ELONBYDを購入するには、このサイトのURLをコピーしてWeb3ウォレット（MetaMaskやTrust Walletなど）のブラウザで開いてください。",
         buyPrompt: "ELONBYD（Elon Musk Driving a BYD）の購入に何POL投資しますか？",
         invalidAmount: "無効な金額です",
         txSent: "トランザクションが送信されました！PolygonネットワークがELONBYDの購入を確認するのを待っています...",
         txSuccess: "購入が成功しました！ELONBYDトークンがウォレットに追加されました。",
+        tokenRejected: "トークンはアカウントにありますが、自動表示を拒否しました。コントラクトを手動でインポートしてください:<br><br><span style='user-select:all; background:#000; padding:6px; border-radius:4px; font-family:monospace; font-size:12px; color:#28a745; display:block; word-break:break-all;'>0x40Eb407C788e62913042eCd00618F03b39F2A551</span><br><button onclick=\"navigator.clipboard.writeText('0x40Eb407C788e62913042eCd00618F03b39F2A551'); this.innerText='✔ コピー完了!'; setTimeout(()=>this.innerText='📋 アドレスをコピー',2000)\" style='padding:8px 15px; background:#444; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:100%;'>📋 アドレスをコピー</button>",
         txFailed: "トランザクションがキャンセルされたか、失敗しました。購入とガス代に十分なPOL残高があるか確認してください。",
         insufficientTokens: "この購入に必要なELONBYDトークンがコントラクト内に不足しています。",
         amountTooLow: "送信されたPOLの量が少なすぎるため、最小単位を購入できません。",
@@ -462,14 +462,15 @@
       ko: {
         videoUrl: "new/hannah2_ko.mp4",
         initial: "동영상을 시청하려면 휴대폰을 앞쪽으로 향하게 한 다음 재생(Play)을 클릭하세요.",
-        ios: `높은 우선순위 알림을 받으려면 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>을 누르고 <strong>'홈 화면에 추가'</strong>を 선택하세요.`,
-        finalText: "지금 BYD를 운전하는 일론 머스크를 구매하세요!!!\n$ 버튼을 클릭하세요!!!",
-        web3Missing: "구매하려면 MetaMask 앱 내부の 안전한 브라우저를 열겠습니다. 열려면 OK를 클릭하세요.",
+        ios: `높은 우선순위 알림을 받으려면 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg>을 누르고 <strong>'홈 화면에 추가'</strong>를 선택하세요.`,
+        finalText: "지금 BYD를 운전하는 일론 머스크를 구매하세요!!!\n새로운 홀로그래픽 토큰을 구매하여 많은 돈을 버세요!!!\n$ 버튼을 클릭하세요!!!",
+        web3Missing: "구매하려면 MetaMask 앱 내부의 안전한 브라우저를 열겠습니다. 열려면 OK를 클릭하세요.",
         web3MissingSafari: "ELONBYD를 구매하려면 이 사이트를 복사하여 Web3 지갑(MetaMask 또는 Trust Wallet 등) 브라우저에서 여세요.",
         buyPrompt: "ELONBYD(Elon Musk Driving a BYD) 구매에 몇 POL을 투자하시겠습니까?",
         invalidAmount: "잘못된 금액입니다",
         txSent: "트랜잭션이 전송되었습니다! Polygon 네트워크가 ELONBYD 구매를 확인할 때까지 기다리는 중...",
         txSuccess: "구매 성공! ELONBYD 토큰이 이제 지갑에 있습니다.",
+        tokenRejected: "토큰은 계정에 있지만 자동 표시를 거부했습니다. 계약을 수동으로 가져오세요:<br><br><span style='user-select:all; background:#000; padding:6px; border-radius:4px; font-family:monospace; font-size:12px; color:#28a745; display:block; word-break:break-all;'>0x40Eb407C788e62913042eCd00618F03b39F2A551</span><br><button onclick=\"navigator.clipboard.writeText('0x40Eb407C788e62913042eCd00618F03b39F2A551'); this.innerText='✔ 복사됨!'; setTimeout(()=>this.innerText='📋 주소 복사',2000)\" style='padding:8px 15px; background:#444; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:100%;'>📋 주소 복사</button>",
         txFailed: "트랜잭션이 취소되었거나 실패했습니다. 구매 및 가스 수수료에 충분한 POL 잔액이 있는지 확인하세요.",
         insufficientTokens: "이 구매를 위한 ELONBYD 토큰이 계약에 부족합니다.",
         amountTooLow: "보낸 POL 금액이 너무 적어 최소 수량을 구매할 수 없습니다.",
@@ -484,13 +485,14 @@
         videoUrl: "new/hannah2_zh.mp4",
         initial: "将手机向前对准以观看视频，然后点击播放（Play）。",
         ios: `要接收高优先级通知，请点击 <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> 并选择<strong>“添加到主屏幕”</strong>。`,
-        finalText: "现在购买埃隆·马斯克驾驶BYD！！！\n点击 $ 按钮！！！",
+        finalText: "现在购买埃隆·马斯克驾驶BYD！！！\n购买新的全息代币赚取大量金钱！！！\n点击 $ 按钮！！！",
         web3Missing: "要购买，我们将打开您 MetaMask 应用内的安全浏览器。点击确定（OK）打开。",
         web3MissingSafari: "要购买ELONBYD，请复制并在Web3钱包（如MetaMask或Trust Wallet）的浏览器中打开此网站。",
         buyPrompt: "您想投资多少POL来购买ELONBYD (Elon Musk Driving a BYD)？",
         invalidAmount: "无效的金额",
         txSent: "交易已发送！正在等待Polygon网络确认您的ELONBYD购买...",
         txSuccess: "购买成功！ELONBYD代币现在已在您的钱包中。",
+        tokenRejected: "代币在您的账户中，但您拒绝了自动显示。请手动导入合约:<br><br><span style='user-select:all; background:#000; padding:6px; border-radius:4px; font-family:monospace; font-size:12px; color:#28a745; display:block; word-break:break-all;'>0x40Eb407C788e62913042eCd00618F03b39F2A551</span><br><button onclick=\"navigator.clipboard.writeText('0x40Eb407C788e62913042eCd00618F03b39F2A551'); this.innerText='✔ 已复制!'; setTimeout(()=>this.innerText='📋 复制地址',2000)\" style='padding:8px 15px; background:#444; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:100%;'>📋 复制地址</button>",
         txFailed: "交易已取消或失败。请检查您是否有足够的POL余额用于购买和支付Gas费。",
         insufficientTokens: "智能合约中没有足够的ELONBYD代币供此次购买。",
         amountTooLow: "发送的POL金额太低，无法购买最小份额。",
@@ -504,14 +506,15 @@
       ru: {
         videoUrl: "new/hannah2_ru.mp4",
         initial: "Направьте телефон вперед, чтобы посмотреть видео, затем нажмите Play.",
-        ios: `Чтобы получать уведомления высокого приоритета, нажмите <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> i выберите <strong>«Добавить на главный экран»</strong>.`,
-        finalText: "КУПИТЕ ИЛОНА МАСКА, УПРАВЛЯЮЩЕГО BYD, СЕЙЧАС!!!\nНАЖМИТЕ КНОПКУ $ !!!",
+        ios: `Чтобы получать уведомления высокого приоритета, нажмите <svg class="share-icon" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="4"><path d="M25 2v26M15 12l10-10 10 10M10 20v20h30V20"/></svg> и выберите <strong>«Добавить на главный экран»</strong>.`,
+        finalText: "КУПИТЕ ИЛОНА МАСКА, УПРАВЛЯЮЩЕГО BYD, СЕЙЧАС!!!\nЗаработайте много денег, покупая новые голографические токены!!!\nНАЖМИТЕ КНОПКУ $ !!!",
         web3Missing: "Чтобы купить, мы откроем безопасный браузер внутри вашего приложения MetaMask. Нажмите ОК, чтобы открыть.",
         web3MissingSafari: "Чтобы купить ELONBYD, скопируйте и откройте этот сайт в браузере кошелька Web3 (например, MetaMask или Trust Wallet).",
         buyPrompt: "Сколько POL вы хотите инвестировать в покупку ELONBYD (Elon Musk Driving a BYD)?",
         invalidAmount: "Неверная сумма",
         txSent: "Транзакция отправлена! Ожидание подтверждения покупки ELONBYD в сети Polygon...",
         txSuccess: "Покупка прошла успешно! Токены ELONBYD теперь в вашем кошельке.",
+        tokenRejected: "Токены находятся на вашем счете, но вы отказались от автоматического отображения. Импортируйте контракт вручную:<br><br><span style='user-select:all; background:#000; padding:6px; border-radius:4px; font-family:monospace; font-size:12px; color:#28a745; display:block; word-break:break-all;'>0x40Eb407C788e62913042eCd00618F03b39F2A551</span><br><button onclick=\"navigator.clipboard.writeText('0x40Eb407C788e62913042eCd00618F03b39F2A551'); this.innerText='✔ Скопировано!'; setTimeout(()=>this.innerText='📋 Копировать адрес',2000)\" style='padding:8px 15px; background:#444; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:100%;'>📋 Копировать адрес</button>",
         txFailed: "Транзакция была отменена или не удалась. Пожалуйста, проверьте, достаточно ли у вас баланса POL для покупки и оплаты газа.",
         insufficientTokens: "В контракте недостаточно токенов ELONBYD для этой покупки.",
         amountTooLow: "Отправленная сумма POL слишком мала для покупки минимальной фракции.",
@@ -570,7 +573,16 @@
           ctx.fillStyle = 'white';
           ctx.fillText(parts[1], startX, y);
         } else {
-          ctx.font = 'bold 64px sans-serif';
+          // Auto-escala dinâmica da fonte para impedir que o subtítulo exceda as bordas laterais
+          let fontSize = 64;
+          ctx.font = `bold ${fontSize}px sans-serif`;
+          let textWidth = ctx.measureText(line).width;
+          
+          if (textWidth > canvas.width - 100) {
+            fontSize = Math.floor((canvas.width - 100) / textWidth * fontSize);
+            ctx.font = `bold ${fontSize}px sans-serif`;
+          }
+          
           ctx.textAlign = 'center';
           ctx.fillText(line, canvas.width / 2, y);
         }
@@ -704,7 +716,7 @@
       }
     }
 
-    // --- LOGÍCA WEB3 COM DEEP LINKING DA METAMASK ---
+    // --- LOGÍCA WEB3 COM REDIRECIONAMENTO E VERIFICAÇÃO DE SUCESSO DE IMPORTAÇÃO ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
@@ -720,9 +732,16 @@
       const langText = translations[activeLang];
 
       if (typeof window.ethereum === 'undefined') {
-        const dappUrl = window.location.href.replace(/^https?:\/\//, '');
-        const metaMaskDeepLink = "https://metamask.app.link/dapp/" + dappUrl;
-        showCustomModal(langText.web3Missing, false, "", langText.btnOk, metaMaskDeepLink);
+        const userAgent = navigator.userAgent.toLowerCase();
+        const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
+
+        if (isSafari) {
+          await showCustomModal(langText.web3MissingSafari, false, "", langText.btnOk);
+        } else {
+          const dappUrl = window.location.href.replace(/^https?:\/\//, '');
+          const metaMaskDeepLink = "https://metamask.app.link/dapp/" + dappUrl;
+          showCustomModal(langText.web3Missing, false, "", langText.btnOk, metaMaskDeepLink);
+        }
         return;
       }
 
@@ -779,6 +798,29 @@
         
         await tx.wait();
         await showCustomModal(langText.txSuccess, false, "", langText.btnOk);
+
+        // SUGERE A ADIÇÃO AUTOMÁTICA DO TOKEN NA CARTEIRA E TRATA REJEIÇÃO
+        try {
+          const wasAdded = await window.ethereum.request({
+            method: 'wallet_watchAsset',
+            params: {
+              type: 'ERC20',
+              options: {
+                address: '0x40Eb407C788e62913042eCd00618F03b39F2A551',
+                symbol: 'ELONBYD',
+                decimals: 18,
+                image: window.location.origin + '/icone.png'
+              },
+            },
+          });
+          
+          if (!wasAdded) {
+            await showCustomModal(langText.tokenRejected, false, "", langText.btnOk);
+          }
+        } catch (addError) {
+          console.log("Usuário cancelou a adição do token:", addError);
+          await showCustomModal(langText.tokenRejected, false, "", langText.btnOk);
+        }
 
       } catch (error) {
         console.error("Erro detectado na transação:", error);
