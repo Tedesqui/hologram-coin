@@ -138,7 +138,7 @@
       100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); transform: scale(1); }
     }
     .pulse-5-times {
-      animation: ripplePulse 0.5s ease-out 10 !important; /* 0.8s cada pulso x 5 = 4 segundos */
+      animation: ripplePulse 0.8s ease-out 10 !important; /* 0.8s cada pulso x 5 = 4 segundos */
     }
 
     #footerSocial { position: fixed; bottom: 0; left: 0; right: 0; padding: 20px 0; display: flex; justify-content: center; align-items: center; gap: 40px; z-index: 998; background-color: rgba(0, 0, 0, 0.1); box-shadow: 0 0 19.5px rgba(0, 0, 0, 0.47); }
@@ -283,7 +283,7 @@
       // Limpa a classe após terminar (4 segundos) para que possa pulsar de novo depois
       setTimeout(() => {
         buyTokenBtn.classList.remove('pulse-5-times');
-      }, 5000);
+      }, 8000);
     }
 
     // --- INICIALIZADOR DA WEBCAM NATIVA ---
