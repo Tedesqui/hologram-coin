@@ -1,67 +1,69 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
-  // Configuração de CORS para permitir que o aplicativo Unity se comunique sem bloqueios
+  // 1. Libera o acesso para o Unity conseguir se comunicar sem bloqueio (CORS)
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
-  // Responde rapidamente ao "Preflight" do navegador/Unity
+  // Responde rapidamente a checagens de segurança do navegador/celular
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
 
-  // Bloqueia qualquer tentativa que não seja um envio de dados (POST)
+  // 2. Proteção: Só aceita métodos POST (que é o que o Unity usa para enviar dados)
   if (req.method !== 'POST') {
-    return res.status(405).json({ sucesso: false, error: 'Método não permitido. Use POST.' });
+    return res.status(405).json({ sucesso: false, error: 'Método não permitido' });
   }
 
   try {
-    const { quantidadeFichas, emailJogador } = req.body;
+    // 3. Lê o pacote exato que o Unity mandou
+    const { quantidadeFichas } = req.body;
 
-    // Converte a quantidade de fichas nos preços exatos em dólares americanos (centavos)
-    let unit_amount = 0;
-    if (quantidadeFichas === 5) unit_amount = 199;       // $1.99
-    else if (quantidadeFichas === 10) unit_amount = 299; // $2.99
-    else if (quantidadeFichas === 50) unit_amount = 999; // $9.99
-    else {
-        return res.status(400).json({ sucesso: false, error: 'Quantidade de pacotes inválida.' });
+    // Se o Unity não mandou a quantidade, retorna o famoso erro 400
+    if (!quantidadeFichas) {
+      return res.status(400).json({ sucesso: false, error: "Faltou enviar a quantidade de fichas" });
     }
 
-    // Cria a sessão de pagamento segura hospedada pelo próprio Stripe
+    // 4. Define o preço em centavos baseado no clique do jogador ($1.99 = 199 centavos)
+    let precoCentavos = 0;
+    if (quantidadeFichas === 5) precoCentavos = 199;
+    else if (quantidadeFichas === 10) precoCentavos = 299;
+    else if (quantidadeFichas === 50) precoCentavos = 999;
+    else precoCentavos = 199; // Segurança caso venha um valor estranho
+
+    // 5. Cria a tela de pagamento oficial no Stripe
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      customer_email: emailJogador, // Opcional: preenche o email do cliente automaticamente se você tiver
       line_items: [
         {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `${quantidadeFichas} AR Tokens`,
-              description: `Virtual currency for Augmented Reality game.`,
+              name: `${quantidadeFichas} Tokens`,
+              description: 'Premium Tokens',
             },
-            unit_amount: unit_amount,
+            unit_amount: precoCentavos,
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      // URLs para onde o Stripe manda o usuário após ele pagar ou cancelar
-      // Como o usuário está no celular, essas páginas abrirão no navegador.
-      success_url: 'https://hologram-coin.com/sucesso.html', 
-      cancel_url: 'https://hologram-coin.com/cancelado.html',
+      // Para onde o jogador vai depois que pagar ou cancelar (pode ser seu Instagram ou site)
+      success_url: 'https://google.com',
+      cancel_url: 'https://google.com',
     });
 
-    // Devolve a URL do Checkout para o Unity abrir a tela no celular
+    // 6. Devolve a URL do Checkout de volta para o Unity abrir o navegador!
     return res.status(200).json({
       sucesso: true,
       urlCheckout: session.url
     });
 
   } catch (error) {
-    console.error('Erro crítico no Stripe:', error);
-    return res.status(500).json({ sucesso: false, error: 'Erro interno ao processar o pagamento.' });
+    console.error("Erro interno:", error);
+    return res.status(500).json({ sucesso: false, error: error.message });
   }
 }
