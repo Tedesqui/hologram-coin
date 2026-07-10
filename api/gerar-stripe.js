@@ -17,7 +17,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Tenta ler o corpo independente do formato que o Unity enviou
     let corpo = req.body;
     if (typeof corpo === 'string') {
       try { corpo = JSON.parse(corpo); } catch(e) {}
@@ -25,26 +24,20 @@ export default async function handler(req, res) {
 
     const quantidadeFichas = corpo?.quantidadeFichas;
 
-    // Agora só bloqueia se realmente estiver ausente (aceita se o Unity mandar o número 0 por engano)
     if (quantidadeFichas === undefined || quantidadeFichas === null) {
       return res.status(400).json({ 
         sucesso: false, 
-        error: "O servidor não conseguiu ler o número enviado. O Unity mandou: " + JSON.stringify(req.body)
+        error: "O servidor não conseguiu ler a quantidade de fichas."
       });
     }
 
-    // Calcula o preço: se o Unity mandar 0 por engano, cobra o valor mínimo para não travar
     let precoCentavos = 199;
     let nomePacote = `${quantidadeFichas} Tokens`;
     
     if (quantidadeFichas === 5) precoCentavos = 199;
     else if (quantidadeFichas === 10) precoCentavos = 299;
     else if (quantidadeFichas === 50) precoCentavos = 999;
-    else {
-        // Se cair aqui, é porque a caixinha no Unity ficou vazia e enviou "0"
-        precoCentavos = 199;
-        nomePacote = "Tokens (Erro: Unity enviou Zero)";
-    }
+    else precoCentavos = 199;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -54,7 +47,7 @@ export default async function handler(req, res) {
             currency: 'usd',
             product_data: {
               name: nomePacote,
-              description: 'Premium Tokens',
+              description: 'Premium Tokens for Hologram Coin',
             },
             unit_amount: precoCentavos,
           },
@@ -62,8 +55,9 @@ export default async function handler(req, res) {
         },
       ],
       mode: 'payment',
-      success_url: 'https://google.com',
-      cancel_url: 'https://google.com',
+      // O STRIPE EXIGE O HTTPS:// AQUI PARA NÃO DAR ERRO 400
+      success_url: 'https://www.hologram-coin.com/',
+      cancel_url: 'https://www.hologram-coin.com/',
     });
 
     return res.status(200).json({
@@ -72,7 +66,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("Erro interno:", error);
+    console.error("Erro interno do Stripe:", error);
     return res.status(500).json({ sucesso: false, error: error.message });
   }
 }
