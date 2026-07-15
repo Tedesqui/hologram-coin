@@ -1,9 +1,10 @@
 {
   "name": "backend-cacaniquel",
   "version": "1.0.0",
-  "description": "API para pagamentos PIX e Stripe",
-  "main": "api/gerar-stripe.js",
+  "description": "API para pagamentos PIX, Stripe e Crypto",
+  "main": "api/gerar-pix.js",
   "dependencies": {
-    "stripe": "^14.0.0"
+    "stripe": "^14.0.0",
+    "mercadopago": "^2.0.0"
   }
 }
