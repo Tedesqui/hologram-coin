@@ -70,7 +70,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       sucesso: true,
       urlCheckout: dadosFatura.invoice_url 
-    });
+      pagamentoId: dadosFatura.id.toString() // <- ADICIONE ESTA LINHA AQUI
+  });
 
   } catch (error) {
     console.error("Erro interno Cripto:", error);
