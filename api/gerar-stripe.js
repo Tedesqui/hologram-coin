@@ -47,7 +47,7 @@ export default async function handler(req, res) {
             currency: 'usd',
             product_data: {
               name: nomePacote,
-              description: 'Tokens for Hologram Slot Machine',
+              description: 'Tokens for Hologram SUPER SLOT',
             },
             unit_amount: precoCentavos,
           },
