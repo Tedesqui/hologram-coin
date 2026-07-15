@@ -62,7 +62,8 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       sucesso: true,
-      urlCheckout: session.url
+      urlCheckout: session.url,
+      pagamentoId: session.id // <--- ESTA É A LINHA QUE FAZ O SISTEMA DE VERIFICAÇÃO FUNCIONAR
     });
 
   } catch (error) {
