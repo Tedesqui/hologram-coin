@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
@@ -157,13 +158,40 @@
       animation: ripplePulse 0.8s ease-out 10 !important; /* 0.8s * 10 = 8 segundos */
     }
 
-    #footerSocial { position: fixed; bottom: 0; left: 0; right: 0; padding: 20px 0; display: flex; justify-content: center; align-items: center; gap: 40px; z-index: 998; background-color: rgba(0, 0, 0, 0.1); box-shadow: 0 0 19.5px rgba(0, 0, 0, 0.47); }
-    #footerSocial a { display: flex; align-items: center; justify-content: center; width: 34.56px; height: 34.56px; text-decoration: none; }
-    #footerSocial svg { width: 100%; height: 100%; transition: transform 0.3s ease; }
-    #footerSocial a:hover svg { transform: scale(1.1); }
+    /* --- REDES SOCIAIS (AGORA COMO BOTÕES QUADRADOS ARREDONDADOS) --- */
+    #footerSocial { 
+      position: fixed; bottom: 0; left: 0; right: 0; padding: 20px 0; 
+      display: flex; justify-content: center; align-items: center; gap: 30px; 
+      z-index: 998; background-color: rgba(0, 0, 0, 0.1); 
+      box-shadow: 0 0 19.5px rgba(0, 0, 0, 0.47); 
+    }
     
-    #footerSocial a.instagram { width: 41.47px; height: 41.47px; position: relative; left: 1px; }
-    #footerSocial a.telegram, #footerSocial a.telegram svg { width: 51.84px; height: 51.84px; }
+    #footerSocial a { 
+      display: flex; align-items: center; justify-content: center; 
+      width: 48px; height: 48px; /* Tamanho uniforme dos botões */
+      text-decoration: none; 
+      background-color: rgba(0, 0, 0, 0.6); /* Cor de fundo escura */
+      border: 2px solid rgba(255, 255, 255, 0.4); /* Borda idêntica aos botões ! e ? originais */
+      border-radius: 12px; /* Cantos arredondados intuitivos */
+      backdrop-filter: blur(5px);
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    
+    #footerSocial a:hover { 
+      transform: scale(1.1); 
+      background-color: rgba(0, 0, 0, 0.9); 
+    }
+    
+    #footerSocial svg { 
+      width: 26px; height: 26px; /* Tamanho padronizado das logos */
+      transition: transform 0.3s ease; 
+    }
+    
+    /* Ajuste fino de 3 pixels à direita para o Instagram (além do alinhamento base) */
+    #footerSocial a.instagram { 
+      position: relative; left: 4px; /* 1px original + 3px solicitados */
+    }
+    
     #footerSocial .twitter svg { fill: #ffffff; } 
     #footerSocial .instagram svg { fill: #833AB4; }
     #footerSocial .telegram svg { fill: #0088cc; }
@@ -207,7 +235,7 @@
     #closeInstructionsBtn:hover { transform: scale(1.1); }
     #instructionsText {
       font-size: 18px; line-height: 1.6; max-width: 600px;
-      transform: translateY(-50px);
+      transform: translateY(-100px); /* Texto subido +50 pixels (antes era -50px) */
     }
 
     /* --- ESTILOS DO MODAL CUSTOMIZADO PREMIUM --- */
@@ -818,7 +846,6 @@
 
     // --- LÓGICA DA TELA PRETA DE INSTRUÇÕES ---
     rightInfoBtn.addEventListener('click', () => {
-      // Tenta tocar o áudio e captura o erro caso o navegador bloqueie o autoplay por falta de interação prévia
       clickSound.play().catch(e => console.log("Áudio bloqueado pelo navegador até a primeira interação", e));
       instructionsScreen.classList.remove('hidden');
     });
