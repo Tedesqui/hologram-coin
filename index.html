@@ -133,15 +133,18 @@
     /* --- GRUPO CENTRAL DE BOTÕES (!, $, ?) --- */
     #central-button-container { 
       position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); 
-      z-index: 999; pointer-events: auto; display: flex; align-items: center; gap: 15px;
+      z-index: 999; pointer-events: auto; display: flex; align-items: center; gap: 35px;
     }
     .side-button { 
-      width: 44px; height: 44px; background-color: rgba(0, 0, 0, 0.6); color: white; 
-      border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; font-size: 22px; 
-      font-weight: bold; cursor: pointer; transition: transform 0.3s ease, background 0.3s;
-      display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);
+      width: 44px; height: 44px; color: white; border: 2px solid rgba(255,255,255,0.4); 
+      border-radius: 50%; font-size: 22px; font-weight: bold; cursor: pointer; 
+      transition: transform 0.3s ease, background 0.3s; display: flex; align-items: center; 
+      justify-content: center; backdrop-filter: blur(5px);
     }
-    .side-button:hover { transform: scale(1.1); background-color: rgba(0, 0, 0, 0.9); }
+    .side-button:hover { transform: scale(1.1); }
+    .blue-btn { background-color: #007bff !important; }
+    .yellow-btn { background-color: #ffc107 !important; color: #000 !important; }
+    
     .prosperity-button { display: flex; align-items: center; justify-content: center; width: 51.84px; height: 51.84px; background-color: #28a745; color: white; border-radius: 50%; font-size: 30px; font-weight: bold; text-decoration: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s ease; border: none; cursor: pointer; }
     .prosperity-button:hover { transform: scale(1.1); }
     
@@ -151,7 +154,7 @@
       100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); transform: scale(1); }
     }
     .pulse-5-times {
-      animation: ripplePulse 0.8s ease-out 10 !important;
+      animation: ripplePulse 0.8s ease-out 10 !important; /* 0.8s * 10 = 8 segundos */
     }
 
     #footerSocial { position: fixed; bottom: 0; left: 0; right: 0; padding: 20px 0; display: flex; justify-content: center; align-items: center; gap: 40px; z-index: 998; background-color: rgba(0, 0, 0, 0.1); box-shadow: 0 0 19.5px rgba(0, 0, 0, 0.47); }
@@ -189,7 +192,7 @@
     /* --- ESTILOS DO MODAL DE INSTRUÇÕES (TELA PRETA) --- */
     #instructionsScreen {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background-color: #000000; color: #ffffff; z-index: 1000000; /* Z-index altíssimo para sobrepor tudo */
+      background-color: #000000; color: #ffffff; z-index: 1000000; 
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       padding: 30px; box-sizing: border-box; text-align: center;
       opacity: 1; transition: opacity 0.3s ease;
@@ -204,6 +207,7 @@
     #closeInstructionsBtn:hover { transform: scale(1.1); }
     #instructionsText {
       font-size: 18px; line-height: 1.6; max-width: 600px;
+      transform: translateY(-50px);
     }
 
     /* --- ESTILOS DO MODAL CUSTOMIZADO PREMIUM --- */
@@ -298,9 +302,9 @@
 
   <!-- GRUPO DE BOTÕES INFERIORES -->
   <div id="central-button-container">
-    <button id="leftLinkBtn" class="side-button">!</button>
+    <button id="leftLinkBtn" class="side-button blue-btn">!</button>
     <button id="buyTokenBtn" class="prosperity-button" aria-label="Comprar Tokens ELONBYD">$</button>
-    <button id="rightInfoBtn" class="side-button">?</button>
+    <button id="rightInfoBtn" class="side-button yellow-btn">?</button>
   </div>
 
   <div id="footerSocial">
@@ -324,6 +328,9 @@
     const instructionsScreen = document.getElementById('instructionsScreen');
     const closeInstructionsBtn = document.getElementById('closeInstructionsBtn');
     const instructionsText = document.getElementById('instructionsText');
+    
+    // Áudio do clique
+    const clickSound = new Audio('click.mp3');
 
     // --- FUNÇÃO PARA ACIONAR A PULSAÇÃO NO BOTÃO ---
     function triggerButtonPulse() {
@@ -403,7 +410,7 @@
       });
     }
 
-    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO COM AS INSTRUÇÕES ---
+    // --- DICIONÁRIO DE TRADUÇÕES EXPANDIDO ---
     const translations = {
       pt: {
         metaSubtitle: "Ganhe muito dinheiro comprando novos tokens holográficos!!!",
@@ -709,7 +716,6 @@
         initialMessage.innerText = translations[activeLang].initial;
       }
       
-      // Atualiza o texto de instruções da tela preta
       if (instructionsText) {
         instructionsText.innerText = translations[activeLang].instructions;
       }
@@ -812,6 +818,8 @@
 
     // --- LÓGICA DA TELA PRETA DE INSTRUÇÕES ---
     rightInfoBtn.addEventListener('click', () => {
+      // Tenta tocar o áudio e captura o erro caso o navegador bloqueie o autoplay por falta de interação prévia
+      clickSound.play().catch(e => console.log("Áudio bloqueado pelo navegador até a primeira interação", e));
       instructionsScreen.classList.remove('hidden');
     });
     
@@ -821,7 +829,6 @@
 
     // --- LINK DO BOTÃO ESQUERDO (!) ---
     leftLinkBtn.addEventListener('click', () => {
-      // Basta alterar "https://google.com" para o link que você desejar!
       window.open('https://google.com', '_blank');
     });
 
@@ -841,7 +848,7 @@
       }
     }
 
-    // --- LÓGICA WEB3 COM TRAVA MÍNIMA DE 10 POL E DETECÇÃO DE NAVEGADOR ---
+    // --- LÓGICA WEB3 COM TRAVA MÍNIMA DE 10 POL ---
     const CONTRATO_VENDA_ADDRESS = "0x2228BB60df11da3EcD25EC6b12D1E91e78d46C68"; 
     
     const CONTRATO_VENDA_ABI = [
