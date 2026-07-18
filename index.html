@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
@@ -158,7 +157,7 @@
       animation: ripplePulse 0.8s ease-out 10 !important; /* 0.8s * 10 = 8 segundos */
     }
 
-    /* --- REDES SOCIAIS (AGORA COMO BOTÕES QUADRADOS ARREDONDADOS) --- */
+    /* --- REDES SOCIAIS (BOTÕES QUADRADOS ARREDONDADOS) --- */
     #footerSocial { 
       position: fixed; bottom: 0; left: 0; right: 0; padding: 20px 0; 
       display: flex; justify-content: center; align-items: center; gap: 30px; 
@@ -168,11 +167,11 @@
     
     #footerSocial a { 
       display: flex; align-items: center; justify-content: center; 
-      width: 48px; height: 48px; /* Tamanho uniforme dos botões */
+      width: 48px; height: 48px; 
       text-decoration: none; 
-      background-color: rgba(0, 0, 0, 0.6); /* Cor de fundo escura */
-      border: 2px solid rgba(255, 255, 255, 0.4); /* Borda idêntica aos botões ! e ? originais */
-      border-radius: 12px; /* Cantos arredondados intuitivos */
+      background-color: rgba(0, 0, 0, 0.6); 
+      border: 2px solid rgba(255, 255, 255, 0.4); 
+      border-radius: 12px; 
       backdrop-filter: blur(5px);
       transition: transform 0.3s ease, background-color 0.3s ease;
     }
@@ -182,17 +181,20 @@
       background-color: rgba(0, 0, 0, 0.9); 
     }
     
+    /* Configuração de tamanho dos ícones */
     #footerSocial svg { 
-      width: 26px; height: 26px; /* Tamanho padronizado das logos */
+      width: 26px; height: 26px; /* Tamanho base (X) */
       transition: transform 0.3s ease; 
-      #footerSocial .instagram svg,
-     #footerSocial .telegram svg {
+    }
+    
+    /* Instagram e Telegram maiores */
+    #footerSocial .instagram svg,
+    #footerSocial .telegram svg {
       width: 36px; height: 36px;
     }
     
-    /* Ajuste fino de 3 pixels à direita para o Instagram (além do alinhamento base) */
     #footerSocial a.instagram { 
-      position: relative; left: 4px; /* 1px original + 3px solicitados */
+      position: relative; left: 4px; /* Ajustado para a direita */
     }
     
     #footerSocial .twitter svg { fill: #ffffff; } 
@@ -238,7 +240,7 @@
     #closeInstructionsBtn:hover { transform: scale(1.1); }
     #instructionsText {
       font-size: 18px; line-height: 1.6; max-width: 600px;
-      transform: translateY(-100px); /* Texto subido +50 pixels (antes era -50px) */
+      transform: translateY(-100px); 
     }
 
     /* --- ESTILOS DO MODAL CUSTOMIZADO PREMIUM --- */
