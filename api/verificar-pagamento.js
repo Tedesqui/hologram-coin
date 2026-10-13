@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // Configuração de CORS para aceitar a conexão do Unity
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -34,7 +35,7 @@ export default async function handler(req, res) {
       
       if (mpData.status === 'approved') {
         pago = true;
-        // Puxa o ID do celular e a quantidade escondidos no metadata que configuramos antes
+        // Puxa o ID do celular e a quantidade escondidos no metadata
         deviceId = mpData.metadata?.device_id;
         quantidadeFichas = parseInt(mpData.metadata?.quantidade_fichas) || 0;
       }
@@ -51,10 +52,13 @@ export default async function handler(req, res) {
       
       if (npData.payment_status === 'paid' || npData.payment_status === 'finished' || npData.payment_status === 'confirmed') {
         pago = true;
-        // NOTA: Para Cripto e Stripe funcionarem como o PIX, você precisará garantir que os scripts 
-        // de 'gerar-crypto' e 'gerar-stripe' também salvem o deviceId no metadata/order_description.
-        deviceId = npData.order_description; // Exemplo de onde a NowPayments guarda dados extras
-        quantidadeFichas = parseInt(npData.price_amount) || 0; // Ajuste conforme sua lógica
+        // Puxa o ID do celular que escondemos na descrição
+        deviceId = npData.order_description; 
+        
+        // Puxa o número de fichas de dentro do ID (ex: Crypto_50_123456789)
+        if (npData.order_id && npData.order_id.includes('_')) {
+            quantidadeFichas = parseInt(npData.order_id.split('_')[1]) || 0;
+        }
       }
     }
 
@@ -80,27 +84,27 @@ export default async function handler(req, res) {
     if (pago && deviceId && quantidadeFichas > 0) {
       const firebaseUrl = 'https://super-slot-89c3e-default-rtdb.firebaseio.com';
       
-      // A. Checa se essa transação já foi processada antes (Impede a multiplicação de fichas)
+      // Checa se essa transação já foi processada antes (Impede a multiplicação de fichas)
       const checkRes = await fetch(`${firebaseUrl}/transacoes_processadas/${transacaoId}.json`);
       const isProcessed = await checkRes.json();
 
       if (!isProcessed) {
-        // B. Se é nova, busca o saldo atual desse jogador
+        // Busca o saldo atual desse jogador na nuvem
         const saldoRes = await fetch(`${firebaseUrl}/aparelhos_registrados/${deviceId}/saldo.json`);
         let saldoAtual = await saldoRes.json();
-        if (saldoAtual === null) saldoAtual = 0; // Se der erro, assume 0
+        if (saldoAtual === null) saldoAtual = 0;
 
-        // C. Soma as fichas novas de forma matemática no servidor
+        // Soma as fichas novas matematicamente no servidor
         const novoSaldo = parseInt(saldoAtual) + quantidadeFichas;
 
-        // D. Salva o saldo novo no banco de dados do jogador
+        // Salva o saldo novo no banco de dados do jogador
         await fetch(`${firebaseUrl}/aparelhos_registrados/${deviceId}/saldo.json`, {
           method: 'PUT',
           body: JSON.stringify(novoSaldo),
           headers: { 'Content-Type': 'application/json' }
         });
 
-        // E. Carimba a transação como processada para NUNCA mais somar ela de novo
+        // Carimba a transação como processada para NUNCA mais somar ela de novo
         await fetch(`${firebaseUrl}/transacoes_processadas/${transacaoId}.json`, {
           method: 'PUT',
           body: JSON.stringify(true),
