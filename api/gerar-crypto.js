@@ -23,13 +23,22 @@ export default async function handler(req, res) {
       try { corpo = JSON.parse(corpo); } catch(e) {}
     }
 
-    const quantidadeFichas = corpo?.quantidadeFichas;
+    // Agora extraímos a quantidade E o deviceId que o Unity está enviando
+    const { quantidadeFichas, deviceId } = corpo || {};
 
-    // Trava de segurança: se o Unity não enviou a quantidade, aborta
+    // Trava de segurança 1: se o Unity não enviou a quantidade, aborta
     if (quantidadeFichas === undefined || quantidadeFichas === null) {
       return res.status(400).json({ 
         sucesso: false, 
         error: "O servidor não conseguiu ler a quantidade de fichas."
+      });
+    }
+
+    // Trava de segurança 2: se não tem ID do celular, rejeita a compra
+    if (!deviceId) {
+      return res.status(400).json({ 
+        sucesso: false, 
+        error: 'ID do dispositivo (deviceId) é obrigatório para depositar as fichas.' 
       });
     }
 
@@ -52,8 +61,10 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         price_amount: precoDolar,
         price_currency: 'usd',
-        order_id: 'HologramCoin_' + Date.now(),
-        order_description: nomePacote,
+        // MÁGICA 1: Salvamos a quantidade de fichas no ID (ex: Crypto_50_123456789)
+        order_id: `Crypto_${quantidadeFichas}_${Date.now()}`,
+        // MÁGICA 2: Escondemos o ID do celular na descrição do pedido
+        order_description: deviceId,
         success_url: 'https://www.hologram-coin.com',
         cancel_url: 'https://www.hologram-coin.com'
       })
@@ -69,9 +80,9 @@ export default async function handler(req, res) {
     // Sucesso! Devolve o link da tela de pagamento para o Unity abrir
     return res.status(200).json({
       sucesso: true,
-      urlCheckout: dadosFatura.invoice_url 
-      pagamentoId: dadosFatura.id.toString() // <- ADICIONE ESTA LINHA AQUI
-  });
+      urlCheckout: dadosFatura.invoice_url, // <-- CORRIGIDO: Adicionei a vírgula que faltava aqui
+      pagamentoId: dadosFatura.id.toString()
+    });
 
   } catch (error) {
     console.error("Erro interno Cripto:", error);
