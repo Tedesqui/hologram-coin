@@ -22,12 +22,21 @@ export default async function handler(req, res) {
       try { corpo = JSON.parse(corpo); } catch(e) {}
     }
 
-    const quantidadeFichas = corpo?.quantidadeFichas;
+    // Agora extraímos também o deviceId
+    const { quantidadeFichas, deviceId } = corpo;
 
     if (quantidadeFichas === undefined || quantidadeFichas === null) {
       return res.status(400).json({ 
         sucesso: false, 
         error: "O servidor não conseguiu ler a quantidade de fichas."
+      });
+    }
+
+    // Trava de segurança: Se não tiver deviceId, rejeita a geração do link
+    if (!deviceId) {
+      return res.status(400).json({ 
+        sucesso: false, 
+        error: 'ID do dispositivo (deviceId) é obrigatório para depositar as fichas.' 
       });
     }
 
@@ -58,6 +67,13 @@ export default async function handler(req, res) {
       // O STRIPE EXIGE O HTTPS:// AQUI PARA NÃO DAR ERRO 400
       success_url: 'https://www.hologram-coin.com/',
       cancel_url: 'https://www.hologram-coin.com/',
+      
+      // A MÁGICA ACONTECE AQUI: Guardamos o ID do celular e a quantidade no Stripe!
+      // Nota: O Stripe exige que os valores no metadata sejam strings (texto).
+      metadata: {
+          device_id: deviceId,
+          quantidade_fichas: quantidadeFichas.toString()
+      }
     });
 
     return res.status(200).json({
