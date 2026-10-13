@@ -21,8 +21,16 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // Agora recebemos a quantidade de fichas que o jogador escolheu no Unity
-        const { quantidadeFichas, emailJogador } = req.body;
+        // Agora recebemos também o deviceId que configuramos no Unity
+        const { quantidadeFichas, emailJogador, deviceId } = req.body;
+
+        // Trava de segurança: Se não tiver deviceId, rejeita (evita compras fantasmas)
+        if (!deviceId) {
+            return res.status(400).json({ 
+                sucesso: false, 
+                error: 'ID do dispositivo (deviceId) é obrigatório para depositar as fichas.' 
+            });
+        }
 
         // Tabela de preços fixa e segura no servidor (protegida contra hackers)
         let valorCalculado = 0;
@@ -52,7 +60,12 @@ module.exports = async (req, res) => {
             payer: {
                 email: emailJogador || 'jogador_anonimo@email.com'
             },
-            notification_url: 'https://direitaia.vercel.app/api/webhook' 
+            notification_url: 'https://direitaia.vercel.app/api/webhook',
+            // A MÁGICA ACONTECE AQUI: Guardamos o ID do celular e a quantidade no Mercado Pago!
+            metadata: {
+                device_id: deviceId,
+                quantidade_fichas: parseInt(quantidadeFichas)
+            }
         };
 
         const resultado = await payment.create({ body });
